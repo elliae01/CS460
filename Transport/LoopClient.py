@@ -1,8 +1,7 @@
 import time
 import threading
 
-from Transport import ClientTransport
-
+import ClientTransport
 
 # This serves as a test function to run on the helloClient
 # Will utlize connection2 and transmit via TCP
