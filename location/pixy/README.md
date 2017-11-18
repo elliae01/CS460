@@ -3,12 +3,20 @@ look at hello_pixy.cpp was the first completed program for a single camera.  (MW
 **Build Notes**
 
 cd /CS460/location/pixy/scripts
+
 chmod +x build_hello_pixy.sh
+
 ./build_hello_pixy.sh
 
 run
+
 cd ~/CS460/location/pixy/build/hello_pixy 
+
 ./hello_pixy
+
+or run while still in build folder
+
+~/CS460/location/pixy/build/hello_pixy/hello_pix
 
 
 **git notes**
@@ -17,18 +25,25 @@ git pull
 
 
 git add . # adds all files with changes to commit
+
 git commit -m "Updated Pixy build info for new folder structure"
 
 link
+
 git remote add origin https://github.com/unlimiteddigits/SeniorDesign.git
+
 git push -u origin master
 
+
 git clone https://github.com/unlimiteddigits/SeniorDesign.git
+
 git clone https://github.com/elliae01/CS460.git
 
 -----------------------------
 git rm -r  __pycache__
+
 git commit -m "removed accidental add"
+
 git push -u origin master
 
 
