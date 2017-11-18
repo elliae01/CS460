@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/pixy/src/host/hello_pixy/hello_pixy.cpp
+/home/pi/CS460/location/pixy/src/host/hello_pixy/hello_pixy.cpp
 stdio.h
 -
 stdlib.h
@@ -20,7 +20,7 @@ string
 string.h
 -
 pixy.h
-/home/pi/pixy/src/host/hello_pixy/pixy.h
+/home/pi/CS460/location/pixy/src/host/hello_pixy/pixy.h
 math.h
 -
 

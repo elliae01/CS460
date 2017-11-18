@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/pi/pixy/src/host/hello_pixy/hello_pixy.cpp" "/home/pi/pixy/build/hello_pixy/CMakeFiles/hello_pixy.dir/hello_pixy.cpp.o"
+  "/home/pi/CS460/location/pixy/src/host/hello_pixy/hello_pixy.cpp" "/home/pi/CS460/location/pixy/build/hello_pixy/CMakeFiles/hello_pixy.dir/hello_pixy.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -15,9 +15,9 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/home/pi/pixy/src/host/hello_pixy/src"
-  "/home/pi/pixy/src/host/hello_pixy/include"
-  "/home/pi/pixy/src/host/hello_pixy/../../common"
+  "/home/pi/CS460/location/pixy/src/host/hello_pixy/src"
+  "/home/pi/CS460/location/pixy/src/host/hello_pixy/include"
+  "/home/pi/CS460/location/pixy/src/host/hello_pixy/../../common"
   "/usr/include/libusb-1.0"
   )
 

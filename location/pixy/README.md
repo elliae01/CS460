@@ -1,5 +1,14 @@
 look at hello_pixy.cpp was the first completed program for a single camera.  (MWE-11/06/2017)
 
+Build Notes
+cd /CS460/location/pixy/scripts
+./build_hello_pixy.sh
+
+run
+cd ~/CS460/location/pixy/build/hello_pixy 
+./hello_pixy
+
+
 libpixyusb API Reference:
 
 http://charmedlabs.github.io/pixy/index.html

@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/pi/pixy/src/host/hello_pixy
+CMAKE_SOURCE_DIR = /home/pi/CS460/location/pixy/src/host/hello_pixy
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/pi/pixy/build/hello_pixy
+CMAKE_BINARY_DIR = /home/pi/CS460/location/pixy/build/hello_pixy
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/pixy/build/hello_pixy/CMakeFiles /home/pi/pixy/build/hello_pixy/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/CS460/location/pixy/build/hello_pixy/CMakeFiles /home/pi/CS460/location/pixy/build/hello_pixy/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/pixy/build/hello_pixy/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/CS460/location/pixy/build/hello_pixy/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
