@@ -1,6 +1,7 @@
 look at hello_pixy.cpp was the first completed program for a single camera.  (MWE-11/06/2017)
 
-Build Notes
+**Build Notes**
+
 cd /CS460/location/pixy/scripts
 chmod +x build_hello_pixy.sh
 ./build_hello_pixy.sh
@@ -10,7 +11,8 @@ cd ~/CS460/location/pixy/build/hello_pixy
 ./hello_pixy
 
 
-git notes
+**git notes**
+
 git pull
 
 
