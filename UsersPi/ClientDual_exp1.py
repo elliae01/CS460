@@ -11,7 +11,7 @@ import json
 
 ip = '127.0.0.1'
 port = 51212                   # The same port as used by the server
-delay = 0
+delay = 0.1
 globalSend = 10
 
 def myo(User):
@@ -130,7 +130,6 @@ if __name__ == '__main__':
 	# headData.join()
 
 	# new
-	sendLoopData.join()
 
 	print "myoData.join(@@@@@@@)"
 	myoData.join()
@@ -144,5 +143,6 @@ if __name__ == '__main__':
 	print "locationData.join(@@@@@@@)"
 	locationData.join()
 
+	sendLoopData.join()
 	
 

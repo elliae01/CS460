@@ -8,11 +8,16 @@ from UserInformation import *
 cnx = mysql.connector.connect(user='root', password='password',
 											  host='127.0.0.1',
 											  database='targalytics')
-cnx.start_transaction(isolation_level='READ COMMITTED')
-cursor = cnx.cursor()
+massQuery = None
+times = 0
+
+# def databaseUpdateMany():
+	# cursor.executemany()
 
 def databaseUpdate(sql):
 	query = (sql)
+	cnx.start_transaction(isolation_level='READ COMMITTED')
+	cursor = cnx.cursor()
 	cursor.execute(query)
 	# rows = cursor.fetchall()
 
@@ -22,7 +27,13 @@ def databaseUpdate(sql):
 	#     print(row)
 
 	cnx.commit()
-	# cursor.close()
+	cursor.close()
+	# while(cnx.in_transaction):
+	# 	time.sleep(0.1)
+	# 	times += 1
+	# 	if(times > 10):
+	# 		print "DANGERZONE"
+	# 		break
 	# cnx.close()
 
 def checksum(item):
