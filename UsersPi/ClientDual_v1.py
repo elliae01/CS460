@@ -76,7 +76,7 @@ def sendLoop(User):
 				time.sleep(delay)
 				data = readyData(User)		#MAY HAVE POTENTIAL PROBLEM HERE
 				sockTCP.sendall(data)
-				print checksum(data)
+				print str(11-send) + " " + str(checksum(data))
 				# print data
 				send -= 1
 			sockTCP.close()
@@ -101,7 +101,7 @@ def readyData(dataStruct):
 				7: dataStruct.getHeadXAxis(), 8: dataStruct.getHeadYAxis(), 9: dataStruct.getHeadZAxis(),10: dataStruct.getHeadHeading(), 11: dataStruct.getHeadDegrees(),
 				12: dataStruct.getBodyXAxis(), 13: dataStruct.getBodyYAxis(), 14: dataStruct.getBodyZAxis(), 15: dataStruct.getBodyHeading(), 16: dataStruct.getBodyDegrees(),
 				17: dataStruct.getLocationXAxis(),18:dataStruct.getLocationYAxis(),19:dataStruct.getLocationZAxis(),20:dataStruct.getHeartRate()}
-	return pickle.dumps(structure)
+	return json.dumps(structure)
 
 def checksum(item):
 	h = hashlib.md5()
@@ -130,7 +130,6 @@ if __name__ == '__main__':
 	# headData.join()
 
 	# new
-
 	print "myoData.join(@@@@@@@)"
 	myoData.join()
 
