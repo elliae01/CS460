@@ -21,12 +21,16 @@
 #include <string.h>
 #include "pixy.h"
 #include <math.h>       /* sin */
+#include "actor.cpp"
+
 
 #define BLOCK_BUFFER_SIZE    25
 #define PI 3.14159265
 
 // Pixy Block buffer // 
 struct Block blocks[BLOCK_BUFFER_SIZE];
+
+
 
 static bool run_flag = true;
 
@@ -38,9 +42,11 @@ void handle_SIGINT(int unused)
 }
 
 //begin MWE
-int room_width, room_length;
-int  i_average_counter;
-float f_average_X, f_average_Y, f_average_W, f_average_H,	f_average_AFC, f_average_D;
+	int room_center;
+	Actor aSoldier[10];
+	int room_width, room_length;
+	int  i_average_counter;
+	float f_average_X, f_average_Y, f_average_W, f_average_H,	f_average_AFC, f_average_D;
 
 
 bool p_average_all_data (int &x, int &y, int &w, int &h, float &physical_distance_W, float &angle_from_center) 
@@ -196,7 +202,7 @@ void mapXY(int x, int y){
 	printf("x %i, y%i\n",x,y);
 	printf("|");
 	for(i = 1; i<=room_width; ++i) { 
-		printf("-");
+		printf("--");
 	}
 	printf("|%i wide\n",room_width);
 	for(i = 1; i<=room_length; ++i) { 
@@ -216,13 +222,54 @@ void mapXY(int x, int y){
 	printf("|%i long\n",room_length);
 }
 
-void process_buffer(char buf[128])
+void map4XY(int i_count){
+	int i,j,k;
+        char signature[] = {' ','R','B','G','\0'};
+	bool b_spaced_out;
+
+
+	printf("x %i, y%i\n",room_length,room_width);
+	printf("|");
+	for(i = 1; i<=room_width; ++i) { 
+		printf("--");
+	}
+	printf("|%i wide\n",room_width);
+	for(i = 1; i<=room_length; ++i) { 
+		printf("|");
+		for(j = 1; j<=room_width; ++j) { 
+			b_spaced_out=true;
+			k=0;
+//aSoldier[k].get_id()>=0
+			while (k<=i_count) {
+				if ((i==aSoldier[k].get_room_Y_position()) && (j==aSoldier[k].get_room_X_position()) ) {
+					printf("%c%i",signature[aSoldier[k].get_id()],aSoldier[k].get_index());
+						b_spaced_out=false;
+				} else {
+					if (b_spaced_out) {
+						printf("  ");
+						b_spaced_out=false;
+					};
+				};
+				k++;
+			};
+		}
+		printf("|\n");
+	}
+	printf("|");
+	for(i = 1; i<=room_width; ++i) { 
+		printf("--");
+	}
+	printf("|%i long\n",room_length);
+};
+
+
+void process_buffer(int index, char buf[128])
 {
 	int x, y, w, h, area, id, pixel_width;
 	float aspect, focal_length, physical_width, physical_distance_W, computed_distance;
 	float physical_height, physical_distance_H, physical_aspect;
 	int room_center;
-	float angle_pixel_constant, angle_from_center;
+	float angle_per_pixel, angle_from_center;
 
 	int return_value;
 
@@ -263,6 +310,7 @@ void process_buffer(char buf[128])
 	pixel_width=161;
 
 	focal_length=(pixel_width * physical_distance_W) / physical_width ;
+       // printf("%f  \n", focal_length);
 
 	physical_distance_W=(physical_width * focal_length) / w;
 	physical_distance_H=(physical_height * focal_length) / h;
@@ -270,7 +318,7 @@ void process_buffer(char buf[128])
 		computed_distance=physical_distance_W;
 	} else {
 		computed_distance=physical_distance_H;
-	}
+	};
 //physical_aspect=physical_distance_W / physical_distance_H;
 
 //x=r sin t
@@ -279,10 +327,10 @@ void process_buffer(char buf[128])
 // viewing_angle = 2 * (ATAN(24.5 / 50)) = 52.2 deg => 6.1291 pixels / deg
 
 // .163155337 deg / pixel
-	angle_pixel_constant=.163155337 ;
+	angle_per_pixel=.163155337 ;
 	room_center=160;
 	
-	angle_from_center = (x-room_center+w/2)*angle_pixel_constant;
+	angle_from_center = (x-room_center+w/2)*angle_per_pixel;
 	x=(int(  computed_distance /12* sin( angle_from_center *PI/180)))+room_width/2 ;
 	y=int(  computed_distance/12* cos( angle_from_center*PI/180));
 
@@ -295,16 +343,18 @@ void process_buffer(char buf[128])
 		printf("%i ", w);
 		printf("%f ", computed_distance);
 		printf("%i ", h);
-		printf("%i \n", aspect);
+		printf("%f \n", aspect);
 	
 
 		//output_values(id, x, y, w, h, aspect, area);
-		printf("afc=%f Dist_W=%f Dist_H=%f Physical Aspect= %f\n", angle_from_center, (physical_distance_W), (physical_distance_H),physical_aspect );
+//		printf("afc=%f Dist_W=%f Dist_H=%f Physical Aspect= %f\n", angle_from_center, (physical_distance_W), (physical_distance_H),physical_aspect );
 //		printf("afc=%f Dist=%f Sin(afc)=%f Cos(afc)=%f\n", angle_from_center, (physical_distance_W/12),sin(angle_from_center*PI/180),(cos(angle_from_center*PI/180)) );
 		output_values(id, x, y, w, h, aspect, area);
 	x=(int(  computed_distance /12* sin( angle_from_center *PI/180)))+room_width/2 ;
 	y=int(  computed_distance /12* cos( angle_from_center*PI/180));
-		mapXY(x,y);
+//		printf("angle_from_cente oldr =%f  %i %i %f \n", angle_from_center,x-room_center,w,angle_per_pixel );
+//		mapXY(x,y);
+//		map4XY();
 	} else {
 //		printf("Average false =%f\n",id); 
 //		output_values(id, x, y, w, h, aspect, area);
@@ -323,7 +373,7 @@ int main(int argc, char * argv[])
   int      return_value;
 
 	room_width=13;
-	room_length=19;
+	room_length=30;
 	i_average_counter=0;
 	f_average_X=0;
 	f_average_Y=0;
@@ -431,9 +481,19 @@ if (blocks_copied>0){
 //    printf("My frame %d:\n", i);
     for(index = 0; index != blocks_copied; ++index) {    
        blocks[index].print(buf);
-       //printf("  %s\n", buf);
-	process_buffer(buf);
-}
+	aSoldier[index].set_all(blocks[index].x, blocks[index].y, blocks[index].width, blocks[index].height, blocks[index].signature, index);
+	aSoldier[index+1].set_id(-1);
+	
+//	aSoldier[index].print_index();
+       //printf("%i %s\n",index,buf);
+	//process_buffer(index,buf);
+	};
+		printf("After	\n");
+	map4XY(blocks_copied);
+    for(index = 0; index != blocks_copied; ++index) {    
+		printf("%i %i %i %i %i %i %f \n",index,aSoldier[index].get_id(),aSoldier[index].get_x(),aSoldier[index].get_y(),aSoldier[index].get_w(),aSoldier[index].get_h(),aSoldier[index].get_area(),(aSoldier[index].computed_distance/12));
+	};
+		printf("\n");
     }
     i++;
 //	if (i>1000) {run_flag=false;}
