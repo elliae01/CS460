@@ -56,6 +56,35 @@ create table biometrics(
 	foreign key (people_id) references people(id)
 );
 
+create table targabots(
+	id int auto_increment,
+	primary key (id)
+);
+
+create table targabotsLocations(
+	id int auto_increment,
+	time_stamp datetime not null,
+	locationX float not null,
+	locationY float not null,
+	locationZ float not null,
+	primary key (id)
+);
+
+create table targabotsStates(
+	id int auto_increment,
+	targabot_id int not null,
+	location_id int not null,
+	time_stamp datetime not null,
+	slide int not null,
+	degree int not null,
+	hit boolean not null,
+	hostile boolean not null,
+	visible boolean not null,
+	primary key (id),
+	foreign key (targabot_id) references targabots(id),
+	foreign key (location_id) references targabotLocations(id)
+);
+
 -- test database
 create table test(
 	id int auto_increment,				-- null
