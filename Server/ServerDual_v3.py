@@ -41,8 +41,9 @@ def storeData(jsonData):
 
 			# execute sql queries
 			databaseUpdate(sql)
-	except:
-		print "Error: Could not store data"
+	except Exception, e:
+		print "Error: %s" % e
+		# print "Error: Could not store data"
 
 # Takes possible multiple json entries in same string (messes up normal decoder), returns array of json objects
 def jsonSplitMultiple(jsonData):
@@ -147,6 +148,24 @@ def databaseUpdate(sql):
 	cnx.commit()
 	cursor.close()
 
+def getIPAddress():
+	validIPs = socket.getaddrinfo(socket.gethostname(), port, socket.AF_INET, socket.SOCK_STREAM)
+	options = []
+	for val in validIPs:
+		options.append(val[4][0])
+
+	chosen = 0
+	if (letUserChoose):
+		i = 0
+		for val in options:
+			print "[", i, "]: ", options[i]
+			i += 1
+		try:
+			chosen = int(raw_input("Enter index for IP to use: "))
+		except:
+			print "ERROR: could not parse input index for IP"
+	return options[chosen]
+
 def checksum(item):
 	h = hashlib.md5()
 	h.update(item)
@@ -159,37 +178,48 @@ def noneRemover(item):
 		return item
 
 if __name__ == '__main__':
+	# Global variables
 	global numPacketsRec
 	global cnx
-	cnx = mysql.connector.connect(user='root', password='password',
-											  host='127.0.0.1',
-											  database='targalytics')
+	global letUserChoose
+	global port
 
+	# Setup Variables
 	isTCP = True
 	# isTCP = False
-
-	ip = '192.168.254.30'
+	letUserChoose = True
 	port = 51212
 
-	print "Starting listening"
+	# Connect to database
+	cnx = mysql.connector.connect(user='root', password='password',
+								  host='127.0.0.1',
+								  database='targalytics')
+
+	ip = getIPAddress()
+
+	print "Server Started."
 	print "IP - ", ip
 	print "Port - ", port
 
 	if(isTCP):
-		serverTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		serverTCP.bind((ip,port))
-		while(True):
-			print("-"*35)
-			serverTCP.listen(1)
-			conn,addr = serverTCP.accept()
-			numPacketsRec = 0
+		try:
+			serverTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			serverTCP.bind((ip,port))
 			while(True):
-				data = conn.recv(4096)
-				if not data: break
-				# print "=============PACKET============="
-				storeData(data)	#will be called until connection closes
+				print("-"*35)
+				serverTCP.listen(1)
+				conn,addr = serverTCP.accept()
 
-			conn.close()
+				numPacketsRec = 0
+				while(True):
+					data = conn.recv(4096)
+					if not data: break
+					# print "=============PACKET============="
+					storeData(data)	#will be called until connection closes
+
+				conn.close()
+		except:
+			print "ERROR: IP address ", ip, " not valid"
 		else:
 			serverUDP = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 			serverUDP.bind((ip,port))

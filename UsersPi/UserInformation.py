@@ -1,4 +1,9 @@
 class UserInformation:
+        # Sync variables
+    dataSent = False
+    useRealData = False
+    printCollectedData = False
+
         # VARIABLE ASSIGNMENT
     numberOfUsers=0
     Id = None,
@@ -26,6 +31,19 @@ class UserInformation:
     def __init__(self,Id):
         self.Id = Id
         UserInformation.numberOfUsers += 1
+
+        # Sync variable accessors
+    def setDataSent(self, newSent):
+        self.dataSent = newSent
+
+    def isDataSent(self):
+        return self.dataSent
+
+    def willUseRealData(self):
+        return self.useRealData
+
+    def willPrintCollectedData(self):
+        return self.printCollectedData
 
         # SETTERS
     def setId(self,newId):

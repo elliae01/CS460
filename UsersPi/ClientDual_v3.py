@@ -8,59 +8,99 @@ import pickle
 import hashlib
 import json
 
-global ip, port, delay, globalSend
-ip = '192.168.254.30'
+ip = '192.168.254.16'
 port = 51212                   # The same port as used by the server
 delay = 1
-globalSend = 10
+globalSend = 50
+
 
 def myo(User):
-	send = globalSend
-	while(send > 0):
-		User.setEMG(random.randint(0,100),random.randint(0,100),random.randint(0,100),random.randint(0,100),random.randint(0,100),random.randint(0,100),random.randint(0,100),random.randint(0,100))
-		tempEMG = User.getEMG()
-		# print("Myo - EMG Data = " + str(tempEMG))
-		send -= 1
+	print "myo"
+	while (not User.isDataSent()):
+		if (User.willUseRealData()):
+			'''
+			code for pulling data from device
+
+			code for storing into User object
+			'''
+		else:
+			User.setEMG(random.randint(0, 100), random.randint(0, 100), random.randint(0, 100), random.randint(0, 100),
+						random.randint(0, 100), random.randint(0, 100), random.randint(0, 100), random.randint(0, 100))
+		if(User.willPrintCollectedData()):
+			tempEMG = User.getEMG()
+			print("Myo - EMG Data = " + str(tempEMG))
 		time.sleep(delay)
+	print "DONE myo"
+
 
 def headCompass(User):
-	send = globalSend
-	while(send > 0):
-		User.setHeadXAxis(random.randint(0,100))
-		User.setHeadYAxis(random.randint(0,100))
-		User.setHeadZAxis(random.randint(0,100))
-		tempXAxis = User.getHeadXAxis()
-		tempYAxis = User.getHeadYAxis()
-		tempZAxis = User.getHeadZAxis()
-		# print("Compass - HeadXAxis = " + str(tempXAxis) + "     HeadYAxis = " + str(tempYAxis) + "     HeadZAxis = " + str(tempZAxis))
-		send -= 1
+	print "head"
+	while (not User.isDataSent()):
+		if (User.willUseRealData()):
+			'''
+			code for pulling data from device
+
+			code for storing into User object
+			'''
+		else:
+			User.setHeadXAxis(random.randint(0, 100))
+			User.setHeadYAxis(random.randint(0, 100))
+			User.setHeadZAxis(random.randint(0, 100))
+		if(User.willPrintCollectedData()):
+			tempXAxis = User.getHeadXAxis()
+			tempYAxis = User.getHeadYAxis()
+			tempZAxis = User.getHeadZAxis()
+			print("Compass - HeadXAxis = " + str(tempXAxis) + "     HeadYAxis = " + str(
+				tempYAxis) + "     HeadZAxis = " + str(tempZAxis))
 		time.sleep(delay)
+	print "DONE headCompass"
+
 
 def bodyCompass(User):
-	send = globalSend
-	while(send > 0):
-		User.setBodyXAxis(random.randint(0,100))
-		User.setBodyYAxis(random.randint(0,100))
-		User.setBodyZAxis(random.randint(0,100))
-		tempXAxis = User.getBodyXAxis()
-		tempYAxis = User.getBodyYAxis()
-		tempZAxis = User.getBodyZAxis()
-		# print("Compass - BodyXAxis = " + str(tempXAxis) + "     BodyYAxis = " + str(tempYAxis) + "     BodyZAxis = " + str(tempZAxis))
-		send -= 1
+	print "body"
+	while (not User.isDataSent()):
+		if (User.willUseRealData()):
+			'''
+			code for pulling data from device
+
+			code for storing into User object
+			'''
+		else:
+			User.setBodyXAxis(random.randint(0, 100))
+			User.setBodyYAxis(random.randint(0, 100))
+			User.setBodyZAxis(random.randint(0, 100))
+		if(User.willPrintCollectedData()):
+			tempXAxis = User.getBodyXAxis()
+			tempYAxis = User.getBodyYAxis()
+			tempZAxis = User.getBodyZAxis()
+			print("Compass - BodyXAxis = " + str(tempXAxis) + "     BodyYAxis = " + str(
+				tempYAxis) + "     BodyZAxis = " + str(tempZAxis))
 		time.sleep(delay)
+	print "DONE bodyCompass"
+
 
 def locData(User):
-	send = globalSend
-	while(send > 0):
-		User.setLocationXAxis(random.randint(0,100))
-		User.setLocationYAxis(random.randint(0,100))
-		User.setLocationZAxis(random.randint(0,100))
-		tempXAxis = User.getLocationXAxis()
-		tempYAxis = User.getLocationYAxis()
-		tempZAxis = User.getLocationZAxis()
-		# print("UWB Receiver - LocationXAxis = " + str(tempXAxis) + "     LocationYAxis = " + str(tempYAxis) + "     LocationZAxis = " + str(tempZAxis))
-		send -= 1
+	print "loc"
+	while (not User.isDataSent()):
+		if (User.willUseRealData()):
+			'''
+			code for pulling data from device
+
+			code for storing into User object
+			'''
+		else:
+			User.setLocationXAxis(random.randint(0, 100))
+			User.setLocationYAxis(random.randint(0, 100))
+			User.setLocationZAxis(random.randint(0, 100))
+		if(User.willPrintCollectedData()):
+			tempXAxis = User.getLocationXAxis()
+			tempYAxis = User.getLocationYAxis()
+			tempZAxis = User.getLocationZAxis()
+			print("UWB Receiver - LocationXAxis = " + str(tempXAxis) + "     LocationYAxis = " + str(
+				tempYAxis) + "     LocationZAxis = " + str(tempZAxis))
 		time.sleep(delay)
+	print "DONE locData"
+
 
 def sendLoop(User):
 	send = globalSend
@@ -90,9 +130,10 @@ def sendLoop(User):
 					time.sleep(delay)
 				sockTCP.close()
 				print "TCP socket closed"
+				User.setDataSent(True)
 				break
 			except socket.error, exc:
-				print("Error: %s" % exc)
+				print "Error: %s" % exc
 				serverNotFoundError = True
 				continue
 		else:
@@ -131,31 +172,19 @@ if __name__ == '__main__':
 	headData = Process(target=headCompass, args=[dataStruct])
 	bodyData = Process(target=bodyCompass, args=[dataStruct])
 	locationData = Process(target=locData, args=[dataStruct])
-	sendLoopData.start()
 	myoData.start()
 	headData.start()
 	bodyData.start()
 	locationData.start()
 
+	print "Sleeping for 1 second to let other processes fill data"
+	time.sleep(1)
+	sendLoopData.start()
 
-	# old version
-	# myoData.join()
-	# headData.join()
-
-	# new
-	# print "myoData.join(@@@@@@@)"
 	myoData.join()
-
-	# print "headData.join(@@@@@@@)"
 	headData.join()
-
-	# print "bodyData.join(@@@@@@@)"
 	bodyData.join()
-
-	# print "locationData.join(@@@@@@@)"
 	locationData.join()
-
-	# print "sendLoopData.join(@@@@@@@)"
 	sendLoopData.join()
 	
 
