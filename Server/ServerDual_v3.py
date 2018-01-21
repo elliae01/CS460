@@ -1,14 +1,25 @@
 import socket
 import mysql.connector
 import pickle
-import hashlib
 import json
+import re
 from UserInformation import *
+from threading import Thread
 
 # CANT BE USED OUTSIDE CLASS, ADD AS METHOD TO ALL UserInfo class files
 def printJSON(item):
 	json.dumps(item,default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
+# finds and returns all the full json blocks
+def jsonBlocksExtract(val):
+	temp = re.findall(r'(\{.+?\})',val)
+	return ''.join(temp)
+
+# Removes all json blocks (non-greedy) after extraction
+def jsonBlocksRemove(val):
+	return re.sub(r'(\{.+?\})','',val)
+
+# Returns a json structure representing data
 def packageData(dataStruct):
 	structure = {1:dataStruct.getId(),
 				2:dataStruct.getEMG(),3:dataStruct.getRoll(),4:dataStruct.getPitch(),5:dataStruct.getYaw(),6:dataStruct.getShot(),
@@ -17,35 +28,58 @@ def packageData(dataStruct):
 				17: dataStruct.getLocationXAxis(),18:dataStruct.getLocationYAxis(),19:dataStruct.getLocationZAxis(),20:dataStruct.getHeartRate()}
 	return json.dumps(structure)
 
+# Handles a new connection and sends data to database
+class AcceptThread(Thread):
+	def __init__(self, addr, conn):
+		Thread.__init__(self)
+		self.addr = addr
+		self.conn = conn
+		print "[+] New thread started for " + str(addr)
+
+	def run(self):
+		print "FROM: ", addr
+		accumulated = ""
+		while (True):
+			'''Loops continuously in blocks of 4096 until no more data is received.
+			If many messages are sent (and received) from the same client, you can
+			end up with a full buffer with partial json blocks, which is handled by
+			the jsonBlocksExtract and jsonBlocksRemove methods.'''
+			data = conn.recv(4096)
+			if (not data): break
+			# see if match is found, keep track of number
+			accumulated += data
+			fullBlocks = jsonBlocksExtract(accumulated)
+			if (len(fullBlocks) >= 1):
+				accumulated = jsonBlocksRemove(accumulated)
+				storeData(fullBlocks)
+			else:
+				print "Warning: Partial json block received"
+		conn.close()
+
 # Saves received data from network to database
 def storeData(jsonData):
-	global numPacketsRec
+	lastItemReceived = ""
+
 	# sometimes multiple json structures are put together, this loop handles one by one
 	try:
+		lastItemReceived = jsonData
 		items = jsonSplitMultiple(jsonData)
-		# recNum = 1	#message number
 		for item in items:
-			# TODO: if hash/checksum is same as another, might be using UDP and received dup packet
-			numPacketsRec += 1
-			
 			# turn json into object
 			dataStruct = depackage(item)
 
-			tempPrint = packageData(dataStruct)
+			print packageData(dataStruct)
 
-			print str(numPacketsRec) + ":\t" + checksum(tempPrint)
-			# print dataStruct
-
-			# turn object into sql insert statement
+			# turn object into sql insert statements
 			sql = convertToSqlInsert(dataStruct, "test")
 
 			# execute sql queries
 			databaseUpdate(sql)
 	except Exception, e:
-		print "Error: %s" % e
-		# print "Error: Could not store data"
+		print "Error: Could not store: *",lastItemReceived,"*"
+		print "Exception: %s" % e
 
-# Takes possible multiple json entries in same string (messes up normal decoder), returns array of json objects
+# Takes possible multiple json entries in same string (normal decoder cant handle), returns array of json objects
 def jsonSplitMultiple(jsonData):
 	result = []
 	dec = json.JSONDecoder()
@@ -58,14 +92,7 @@ def jsonSplitMultiple(jsonData):
 
 # Takes json data as input, turns into UserInformation object
 def depackage(item):
-	# print jsonData
-	# Structure = json.loads(item)
 	Structure = item
-
-	# Structure = json.loads(open("jsonData", "r").read())
-
-	# for i in Structure:
-	# 	print Structure["i"]
 
 	# for received data from pi client
 	dataStruct = UserInformation(Structure["1"])
@@ -92,39 +119,41 @@ def depackage(item):
 	return dataStruct
 
 # Extracts data from objects and converts to sql insert statements
-# TODO: make if statements so that multiple datakinds will be saved if they are passed
 def convertToSqlInsert(dataStruct, dataKind):
+	emgData = dataStruct.getEMG()
 	result = ""
-	if(dataKind == "people"):
-		result += sqlizerInsert(
-			"insert into people(id, name)",
-			["null", dataStruct.getId()]
-			)
-	elif(dataKind == "locations"):
-		result += sqlizerInsert(
-			"insert into locations(id, people_id, time_stamp, signature, locationXAxis, locationYAxis, locationZAxis, width, height)",
-			["null", dataStruct.getId(), "now()", dataStruct.getSignature(), dataStruct.getLocationXAxis(), dataStruct.getLocationYAxis(), dataStruct.getLocationZAxis(), "null", "null"]
-			)
-	elif(dataKind == "orientations"):
-		result += sqlizerInsert(
-			"insert into orientations(id, people_id, time_stamp, headXAxis, headYAxis, headZAxis, headHeading, headDegrees, bodyXAxis, bodyYAxis, bodyZAxis, bodyHeading, bodyDegrees)",
-			["null", dataStruct.getId(), "now()", dataStruct.getHeadXAxis(), dataStruct.getHeadYAxis(), dataStruct.getHeadZAxis(), dataStruct.getHeadHeading(), dataStruct.getHeadDegrees(), dataStruct.getBodyXAxis(), dataStruct.getBodyYAxis(), dataStruct.getBodyZAxis(), dataStruct.getBodyHeading(), dataStruct.getBodyDegrees()]
-			)
-	elif(dataKind == "biometrics"):
-		# emgData = ['''make sure data is actually here and not missing values...will cause out of bounds''']
-		emgData = dataStruct.getEMG()
-		result += sqlizerInsert(
-			"insert into biometrics(id, people_id, time_stamp, shot, roll, pitch, yaw, emg_1, emg_2, emg_3, emg_4, emg_5, emg_6, emg_7, emg_8)",
-			["null", dataStruct.getId(), "now()", dataStruct.getShot(), dataStruct.getRoll(), dataStruct.getPitch(), dataStruct.getYaw(), emgData[0], emgData[1], emgData[2], emgData[3], emgData[4], emgData[5], emgData[6], emgData[7]]
-			)
-	else:
-		# else(dataKind == "test"):
-		emgData = dataStruct.getEMG()
-		# print("null", dataStruct.getId(), emgData[0], emgData[1], emgData[2], emgData[3], emgData[4], emgData[5], emgData[6], emgData[7], dataStruct.getHeadXAxis(), dataStruct.getHeadYAxis(), dataStruct.getHeadZAxis(), dataStruct.getBodyXAxis(), dataStruct.getBodyYAxis(), dataStruct.getBodyZAxis(), dataStruct.getLocationXAxis(), dataStruct.getLocationYAxis(), dataStruct.getLocationZAxis())
-		result += sqlizerInsert(
-			"insert into test(id, people_id, emg_1, emg_2, emg_3, emg_4, emg_5, emg_6, emg_7, emg_8, headXAxis, headYAxis, headZAxis, bodyXAxis, bodyYAxis, bodyZAxis, locationXAxis, locationYAxis, locationZAxis)",
-			[str(noneRemover("null")), str(noneRemover(dataStruct.getId())), str(noneRemover(emgData[0])), str(noneRemover(emgData[1])), str(noneRemover(emgData[2])), str(noneRemover(emgData[3])), str(noneRemover(emgData[4])), str(noneRemover(emgData[5])), str(noneRemover(emgData[6])), str(noneRemover(emgData[7])), str(noneRemover(dataStruct.getHeadXAxis())), str(noneRemover(dataStruct.getHeadYAxis())), str(noneRemover(dataStruct.getHeadZAxis())), str(noneRemover(dataStruct.getBodyXAxis())), str(noneRemover(dataStruct.getBodyYAxis())), str(noneRemover(dataStruct.getBodyZAxis())), str(noneRemover(dataStruct.getLocationXAxis())), str(noneRemover(dataStruct.getLocationYAxis())), str(noneRemover(dataStruct.getLocationZAxis()))]
-			)
+
+	# locations
+	result += sqlizerInsert(
+		"insert into locations(id, people_id, time_stamp, locationXAxis, locationYAxis, locationZAxis, width, height)",
+		["null", dataStruct.getId(), "now()", dataStruct.getLocationXAxis(),
+		 dataStruct.getLocationYAxis(), dataStruct.getLocationZAxis(), "null", "null"]
+	)
+
+	# orientations
+	result += sqlizerInsert(
+		"insert into orientations(id, people_id, time_stamp, headXAxis, headYAxis, headZAxis, headHeading, headDegrees, bodyXAxis, bodyYAxis, bodyZAxis, bodyHeading, bodyDegrees)",
+		["null", dataStruct.getId(), "now()", dataStruct.getHeadXAxis(), dataStruct.getHeadYAxis(),
+		 dataStruct.getHeadZAxis(), dataStruct.getHeadHeading(), dataStruct.getHeadDegrees(), dataStruct.getBodyXAxis(),
+		 dataStruct.getBodyYAxis(), dataStruct.getBodyZAxis(), dataStruct.getBodyHeading(), dataStruct.getBodyDegrees()]
+	)
+
+	# biometrics
+	result += sqlizerInsert(
+		"insert into biometrics(id, people_id, time_stamp, shot, roll, pitch, yaw, emg_1, emg_2, emg_3, emg_4, emg_5, emg_6, emg_7, emg_8)",
+		["null", dataStruct.getId(), "now()", dataStruct.getShot(), dataStruct.getRoll(), dataStruct.getPitch(),
+		 dataStruct.getYaw(), emgData[0], emgData[1], emgData[2], emgData[3], emgData[4], emgData[5], emgData[6],
+		 emgData[7]]
+	)
+
+	# test
+	result += sqlizerInsert(
+		"insert into test(id, people_id, emg_1, emg_2, emg_3, emg_4, emg_5, emg_6, emg_7, emg_8, headXAxis, headYAxis, headZAxis, bodyXAxis, bodyYAxis, bodyZAxis, locationXAxis, locationYAxis, locationZAxis)",
+		["null", dataStruct.getId(), emgData[0], emgData[1], emgData[2], emgData[3], emgData[4], emgData[5], emgData[6], emgData[7],
+		 dataStruct.getHeadXAxis(), dataStruct.getHeadYAxis(), dataStruct.getHeadZAxis(), dataStruct.getBodyXAxis(), dataStruct.getBodyYAxis(),
+		 dataStruct.getBodyZAxis(), dataStruct.getLocationXAxis(), dataStruct.getLocationYAxis(), dataStruct.getLocationZAxis()]
+	)
+
 	return result
 
 # Takes input beginning sql statement and array of values. Turns input into sql insert statement.
@@ -134,43 +163,47 @@ def sqlizerInsert(sqlStatementBegin, values):
 		result += str(noneRemover(values[i]))
 		if(i != (len(values)-1)):
 			result += ", "
-	result += ")"
+	result += ");"
 	return result
-
-# def databaseUpdateMany():
-	# cursor.executemany()
 
 # executes sql statements
 def databaseUpdate(sql):
 	# TODO: log errors
 	cursor = cnx.cursor()
-	cursor.execute(sql)
+	for result in cursor.execute(sql,multi=True):
+		if(printDatabaseStatement):
+			if result.with_rows:
+				print("Rows produced by statement '{}':".format(
+					result.statement))
+				print(result.fetchall())
+			else:
+				print("Number of rows affected by statement '{}': {}".format(
+					result.statement, result.rowcount))
 	cnx.commit()
 	cursor.close()
 
+# Automatically determine IP address or let user choose if multiple options available
 def getIPAddress():
 	validIPs = socket.getaddrinfo(socket.gethostname(), port, socket.AF_INET, socket.SOCK_STREAM)
 	options = []
+	# store all valid IPs
 	for val in validIPs:
 		options.append(val[4][0])
 
 	chosen = 0
-	if (letUserChoose):
-		i = 0
-		for val in options:
-			print "[", i, "]: ", options[i]
-			i += 1
-		try:
-			chosen = int(raw_input("Enter index for IP to use: "))
-		except:
-			print "ERROR: could not parse input index for IP"
+	try:
+		if(len(options) >= 2):
+			i = 0
+			for val in options:
+				print "[", i, "]: ", options[i]
+				i += 1
+			chosen = int(raw_input("Enter index of IP to use for server: "))
+	except Exception,e:
+		print "ERROR: trouble parsing index for IP"
+		print "Exception: ",e
 	return options[chosen]
 
-def checksum(item):
-	h = hashlib.md5()
-	h.update(item)
-	return h.hexdigest()
-
+# Turns any Python Nones to 0, for playing nice with database
 def noneRemover(item):
 	if(item == None):
 		return 0
@@ -179,15 +212,11 @@ def noneRemover(item):
 
 if __name__ == '__main__':
 	# Global variables
-	global numPacketsRec
 	global cnx
-	global letUserChoose
 	global port
 
 	# Setup Variables
-	isTCP = True
-	# isTCP = False
-	letUserChoose = True
+	printDatabaseStatement = False	# prints each database statement if set to true
 	port = 51212
 
 	# Connect to database
@@ -195,38 +224,28 @@ if __name__ == '__main__':
 								  host='127.0.0.1',
 								  database='targalytics')
 
-	ip = getIPAddress()
+	ip = getIPAddress()		# automatically choose IP address or list options
 
 	print "Server Started."
 	print "IP - ", ip
 	print "Port - ", port
 
-	if(isTCP):
-		try:
-			serverTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			serverTCP.bind((ip,port))
-			while(True):
-				print("-"*35)
-				serverTCP.listen(1)
-				conn,addr = serverTCP.accept()
+	threads = []
 
-				numPacketsRec = 0
-				while(True):
-					data = conn.recv(4096)
-					if not data: break
-					# print "=============PACKET============="
-					storeData(data)	#will be called until connection closes
-
-				conn.close()
-		except:
-			print "ERROR: IP address ", ip, " not valid"
-		else:
-			serverUDP = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-			serverUDP.bind((ip,port))
-
-			while(True):
-				data,addr = serverUDP.recvfrom(4096)
-				if not data: break
-				print("Data: ", data, ", from: ", addr)
+	try:
+		serverTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		serverTCP.bind((ip,port))
+		while(True):
+			print("-"*35)
+			serverTCP.listen(4)
+			conn,addr = serverTCP.accept()
+			newThread = AcceptThread(addr,conn)
+			newThread.start()
+			threads.append(newThread)
+		for t in threads:
+			t.join()
+	except Exception,e:
+		print "ERROR: IP address ", ip, " not valid (is it already in use?)"
+		print "Exception: ",e
 
 	print("Server Ended.")

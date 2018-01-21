@@ -7,12 +7,13 @@ import socket
 import pickle
 import hashlib
 import json
+import re
 
-ip = '192.168.254.16'
+ip = '192.168.254.22'
 port = 51212                   # The same port as used by the server
 delay = 1
-globalSend = 50
-
+globalSend = 25
+identity = 2
 
 def myo(User):
 	print "myo"
@@ -105,48 +106,34 @@ def locData(User):
 def sendLoop(User):
 	send = globalSend
 	retryTime = 3
-	isTCP = True
-	# isTCP = False
 	serverNotFoundError = False
 
 	while(True):
-		if(isTCP):
-			sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			try:
-				if(serverNotFoundError):
-					print("Server not detected. Retrying in %d seconds..." % retryTime)
-					time.sleep(retryTime)
-					serverNotFoundError = False
-					continue
-				print "TCP connecting..."
-				sockTCP.connect((ip, port))
-				print "TCP connected"
-				while(send > 0):
-					data = packageData(User)
-					sockTCP.sendall(data)
-					print str((globalSend+1)-send) + ":\t" + str(checksum(data))
-					# print data
-					send -= 1
-					time.sleep(delay)
-				sockTCP.close()
-				print "TCP socket closed"
-				User.setDataSent(True)
-				break
-			except socket.error, exc:
-				print "Error: %s" % exc
-				serverNotFoundError = True
+		sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		try:
+			if(serverNotFoundError):
+				print("Server not detected. Retrying in %d seconds..." % retryTime)
+				time.sleep(retryTime)
+				serverNotFoundError = False
 				continue
-		else:
-			sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			print "TCP connecting..."
+			sockTCP.connect((ip, port))
+			print "TCP connected to ",(ip,port)
+			# goat = ""
 			while(send > 0):
-				time.sleep(delay)
-				# data = "Data_" + str(send)
-				# user = createTestUser(send)
-				# data = user.printMe()
-				sockUDP.sendto(data, (ip, port))
-				print data
+				data = packageData(User)
+				sockTCP.sendall(data)
+				print str((globalSend+1)-send) + ":\t" + str(checksum(data))
 				send -= 1
-			sockUDP.close()
+				time.sleep(delay)
+			sockTCP.close()
+			print "TCP socket closed"
+			User.setDataSent(True)
+			break
+		except socket.error, exc:
+			print "Error: %s" % exc
+			serverNotFoundError = True
+			continue
 
 # Takes UserInformation object as input, turns into json data
 def packageData(dataStruct):
@@ -157,6 +144,9 @@ def packageData(dataStruct):
 				17: dataStruct.getLocationXAxis(),18:dataStruct.getLocationYAxis(),19:dataStruct.getLocationZAxis(),20:dataStruct.getHeartRate()}
 	return json.dumps(structure)
 
+def protocolWrap(dataStruct):
+	return "${}${}${}$".format(identity,dataStruct,identity)
+
 def checksum(item):
 	h = hashlib.md5()
 	h.update(item)
@@ -166,7 +156,7 @@ if __name__ == '__main__':
 	BaseManager.register('UserInformation',UserInformation)
 	manager = BaseManager()
 	manager.start()
-	dataStruct = manager.UserInformation('01')
+	dataStruct = manager.UserInformation(str(identity))
 	sendLoopData = Process(target=sendLoop, args=[dataStruct])
 	myoData = Process(target=myo, args=[dataStruct])
 	headData = Process(target=headCompass, args=[dataStruct])

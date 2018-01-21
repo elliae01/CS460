@@ -8,7 +8,6 @@ create table locations(
 	id int auto_increment,							-- null
 	people_id int not null,							-- userObject.getId()
 	time_stamp datetime not null,					-- now()
-	signature int,									-- null
 	locationXAxis float not null,					-- userObject.getLocationXAxis()
 	locationYAxis float not null,					-- userObject.getLocationYAxis()
 	locationZAxis float,							-- userObject.getLocationZAxis()
