@@ -1,9 +1,5 @@
 import socket
 import sys
-import threading
-import myo_raw
-import helloA
-
 
 
 def connection(message):

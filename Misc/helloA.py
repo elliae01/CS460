@@ -1,6 +1,5 @@
 import time
-import threading
-import helloClient
+from Misc import helloClient
 
 
 #This serves as a test function to run on the helloClient
