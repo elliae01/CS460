@@ -24,7 +24,6 @@ class UserInformation:
     visible = None
     hostile = None
     hit = None
-    run = None
 
         # CONSTRUCTOR
     def __init__(self,Id):
@@ -80,8 +79,6 @@ class UserInformation:
         self.hostile = newHostile
     def setHit(self, newHit):
         self.hit = newHit
-    def setRun(self, newRun):
-        self.run = newRun
 
             # GETTERS
     def getId(self):
@@ -132,5 +129,3 @@ class UserInformation:
         return self.hostile
     def getHit(self):
         return self.hit
-    def getRun(self):
-        return self.run

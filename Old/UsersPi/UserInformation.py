@@ -1,4 +1,9 @@
 class UserInformation:
+        # Sync variables
+    dataSent = False
+    useRealData = False
+    printCollectedData = False
+
         # VARIABLE ASSIGNMENT
     numberOfUsers=0
     Id = None,
@@ -21,21 +26,30 @@ class UserInformation:
     locationYAxis = None
     locationZAxis = None
     heartRate = None
-    visible = None
-    hostile = None
-    hit = None
-    run = None
 
         # CONSTRUCTOR
     def __init__(self,Id):
         self.Id = Id
         UserInformation.numberOfUsers += 1
 
+        # Sync variable accessors
+    def setDataSent(self, newSent):
+        self.dataSent = newSent
+
+    def isDataSent(self):
+        return self.dataSent
+
+    def willUseRealData(self):
+        return self.useRealData
+
+    def willPrintCollectedData(self):
+        return self.printCollectedData
+
         # SETTERS
     def setId(self,newId):
         self.Id = newId
-    def setEMG(self,emg1):
-        self.emg = emg1
+    def setEMG(self,emg1,emg2,emg3,emg4,emg5,emg6,emg7,emg8):
+        self.emg = [emg1,emg2,emg3,emg4,emg5,emg6,emg7,emg8]
     def setRoll(self,newRoll):
         self.roll = newRoll
     def setPitch(self,newPitch):
@@ -74,14 +88,6 @@ class UserInformation:
         self.locationZAxis = newLocationZAxis
     def setHeartRate(self, newHeartRate):
         self.heartRate = newHeartRate
-    def setVisible(self, newVisible):
-        self.visible = newVisible
-    def setHostile(self, newHostile):
-        self.hostile = newHostile
-    def setHit(self, newHit):
-        self.hit = newHit
-    def setRun(self, newRun):
-        self.run = newRun
 
             # GETTERS
     def getId(self):
@@ -126,11 +132,3 @@ class UserInformation:
         return self.locationZAxis
     def getHeartRate(self):
         return self.heartRate
-    def getVisible(self):
-        return self.visible
-    def getHostile(self):
-        return self.hostile
-    def getHit(self):
-        return self.hit
-    def getRun(self):
-        return self.run
