@@ -1,11 +1,10 @@
 import socket
 import pickle
 from UserInformation import *
-import mysql.connector
+import cx_Oracle
 from multiprocessing import Process, Manager
 from multiprocessing.managers import *
 import sys
-from DatabaseStorage import *
 from Display import *
 
 def tcpConnect(numberOfConnections,ip, port):
@@ -25,14 +24,14 @@ def tcpConnect(numberOfConnections,ip, port):
     return server, client
 
 
-def dbConnect(user, password, host, databaseName):
+def dbConnect(user, password, host, database):
     try:
-        print("-> Connecting to database ", databaseName, " located at ", host, " as ", user, " with password: ", password)
-        database = mysql.connector.connect(user=user, password=password, host=host, database=databaseName)
+        print("-> Connecting to database ", database, " located at ", host, " as ", user, " with password: ", password)
+        database = cx_Oracle.connect(user, password, host+"/"+database)
         cursor = database.cursor()
-        print("-> Successfully connected to database - ", databaseName, "\n")
+        print("-> Successfully connected to database - ", database, "\n")
     except Exception as err:
-        print("-> Failed to connect to database - ", databaseName)
+        print("-> Failed to connect to database - ", database)
         print("Database error - ", err,"\n")
 
     return database, cursor
@@ -54,19 +53,38 @@ def guiConnect():
 
     return dataStruct, gui
 
+def noneRemover(item):
+	if(item == None):
+		return 0
+	else:
+		return item
+
+
+def dbConnect(user, password, host, database):
+    try:
+        print("-> Connecting to database ", database, " located at ", host, " as ", user, " with password: ", password)
+        database = cx_Oracle.connect(user, password, host + "/" + database)
+        cursor = database.cursor()
+        print("-> Successfully connected to database - ", database, "\n")
+    except Exception as err:
+        print("-> Failed to connect to database - ", database)
+        print("Database error - ", err, "\n")
+
+    return database, cursor
+
 if __name__ == '__main__':
         # TCP CONNECTION
     numberOfConnections = 1
-    ip = '192.168.1.6'
+    ip = '192.168.2.3'
     port = 5000
     server, client = tcpConnect(numberOfConnections, ip, port)
 
         # DATABASE CONNECTION
-    user = 'root'
+    user = 'SYSMAN'
     password = 'System_Admin1'
-    host = '127.0.0.1'
-    databaseName = 'targamite_project'
-    database, cursor = dbConnect(user, password, host, databaseName)
+    host = 'localhost'
+    database = 'orcl'
+    database, cursor = dbConnect(user, password, host, database)
 
         # GUI CONNECTION
     dataStruct, gui = guiConnect()
@@ -74,6 +92,7 @@ if __name__ == '__main__':
         # MAIN LOOP
     print("-> Beginning main collection process\n")
     dataStruct.setRun(True)
+    User = True
     while(dataStruct.getRun()):
         try:
             data = client.recv(4096)
@@ -98,13 +117,35 @@ if __name__ == '__main__':
             dataStruct.setLocationXAxis(Structure[17])
             dataStruct.setLocationYAxis(Structure[18])
             dataStruct.setLocationZAxis(Structure[19])
+            dataStruct.setHeartRate(Structure[20])
+            dataStruct.setVisible(Structure[21])
+            dataStruct.setHostile(Structure[22])
+            dataStruct.setHit(Structure[23])
 
-                # PRODUCE SQL STATEMENT
-            sql = convertToSqlStatement(dataStruct)
-            print("SQL insert statement: \n",sql)
-                # STORE SQL INTO DATABASE
-            # Delays the loop for time set in delay variable
-            databaseUpdate(sql, database)
+            if(User):
+                rawEMG = dataStruct.getEMG()
+                cursor.execute(
+                    "INSERT INTO Shooter_Table VALUES(shooter_index_seq.nextval,CURRENT_TIMESTAMP,SHOOTER(" + str(
+                        dataStruct.getId()) + "," + "Loc_Obj(" + str(dataStruct.getLocationXAxis()) + "," + str(
+                        dataStruct.getLocationYAxis()) + "," + str(dataStruct.getLocationZAxis()) + ")," + str(
+                        dataStruct.getHostile()) + "," + str(dataStruct.getHit()) + "," + str(
+                        dataStruct.getHeartRate()) + "," + "Arm_Obj(Emg_Obj(" + str(rawEMG[0]) + str(rawEMG[1]) + str(
+                        rawEMG[2]) + str(rawEMG[3]) + str(rawEMG[4]) + str(rawEMG[5]) + str(rawEMG[6]) + str(
+                        rawEMG[7]) + ")," + str(dataStruct.getRoll()) + "," + str(dataStruct.getPitch()) + "," + str(
+                        dataStruct.getYaw()) + ")," + str(dataStruct.getShot()) + "," + "Orient_Obj(" + str(
+                        dataStruct.getBodyHeading()) + "," + str(dataStruct.getBodyXAxis()) + "," + str(
+                        dataStruct.getBodyYAxis()) + "),Orient_Obj(" + str(dataStruct.getHeadHeading()) + "," + str(
+                        dataStruct.getHeadXAxis()) + "," + str(dataStruct.getHeadYAxis()) + ")))")
+            else:
+                cursor.execute(
+                    "INSERT INTO Target_Table VALUES(target_index_seq.nextval,CURRENT_TIMESTAMP,TARGET(" + str(
+                        dataStruct.getId()) + "," + "Loc_Obj(" + str(dataStruct.getLocationXAxis()) + "," + str(
+                        dataStruct.getLocationYAxis()) + "," + str(dataStruct.getLocationZAxis()) + ")," + str(
+                        dataStruct.getHostile()) + "," + str(dataStruct.getHit()) + "," + str(
+                        dataStruct.getVisible()) + "))")
+
+            database.commit()
+
 
         except Exception as err:
             print("Main collection process failed")
