@@ -1,6 +1,6 @@
 import socket
 import pickle
-from User_Information_Pi import *
+from UserInformation import *
 
 server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 

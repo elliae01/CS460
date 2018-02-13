@@ -75,7 +75,7 @@ def dbConnect(user, password, host, database):
 if __name__ == '__main__':
         # TCP CONNECTION
     numberOfConnections = 1
-    ip = '192.168.2.3'
+    ip = '10.0.0.170'
     port = 5000
     server, client = tcpConnect(numberOfConnections, ip, port)
 
