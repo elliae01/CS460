@@ -72,12 +72,12 @@ def getIPAddress(port):
         if(len(options) >= 2):
             i = 0
             for val in options:
-                print "[", i, "]: ", options[i]
+                print ("[", i, "]: ", options[i])
                 i += 1
             chosen = int(raw_input("Enter index of IP to use for server: "))
-    except Exception,e:
-        print "ERROR: trouble parsing index for IP"
-        print "Exception: ",e
+    except (Exception,e):
+        print ("ERROR: trouble parsing index for IP")
+        print ("Exception: ",e)
     return options[chosen]
 
 
