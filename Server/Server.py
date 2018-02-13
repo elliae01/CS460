@@ -59,6 +59,27 @@ def noneRemover(item):
 	else:
 		return item
 
+# Automatically determine IP address or let user choose if multiple options available
+def getIPAddress(port):
+    validIPs = socket.getaddrinfo(socket.gethostname(), port, socket.AF_INET, socket.SOCK_STREAM)
+    options = []
+    # store all valid IPs
+    for val in validIPs:
+        options.append(val[4][0])
+
+    chosen = 0
+    try:
+        if(len(options) >= 2):
+            i = 0
+            for val in options:
+                print ("[", i, "]: ", options[i])
+                i += 1
+            chosen = int(raw_input("Enter index of IP to use for server: "))
+    except (Exception,e):
+        print ("ERROR: trouble parsing index for IP")
+        print ("Exception: ",e)
+    return options[chosen]
+
 
 def dbConnect(user, password, host, database):
     try:
@@ -75,8 +96,8 @@ def dbConnect(user, password, host, database):
 if __name__ == '__main__':
         # TCP CONNECTION
     numberOfConnections = 1
-    ip = '10.0.0.170'
     port = 5000
+    ip = getIPAddress(port)
     server, client = tcpConnect(numberOfConnections, ip, port)
 
         # DATABASE CONNECTION
