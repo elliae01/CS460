@@ -142,4 +142,27 @@ class Reactionalytics:
             d = math.sqrt(sq1 + sq2)
         return d
 
+    # Distance function
+    def distance2D(self,xii,xi,yii,yi):
+        sq1 = (xi-xii)*(xi-xii)
+        sq2 = (yi-yii)*(yi-yii)
+        return math.sqrt(sq1 + sq2)
 
+    def DistanceTraveled(self,user,startdate,finishdate):
+        count=self.rowcount()
+        d=0.0
+        for i in range(count-1):
+            if self.getID(i)==user:
+                # print(self.getDate(i),startdate)
+                # print("---")
+                if self.getDate(i)>=startdate and self.getDate(i)<=finishdate:
+                    print(self.getINDEX(i))
+                    x1 = self.getX(i)
+                    y1 = self.getY(i)
+                    x2 = self.getX(i+1)
+                    y2 = self.getY(i+1)
+                    d2 = self.distance2D(x1,x2,y1,y2)
+                    d = d + d2
+            #print(d2,r.distanceFromLastPoint(i+1))
+            #print(d2,r.getINDEX(i))
+        return d

@@ -97,3 +97,5 @@ if __name__ == '__main__':
     print("Total Distance = ", d)
     d=DistanceTraveled(r2,1,StartDate,EndDate)
     print("Total Distance = ", d)
+    d=r2.DistanceTraveled(1,StartDate,EndDate)
+    print("Total Distance = ", d)
