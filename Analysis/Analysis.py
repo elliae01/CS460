@@ -1,5 +1,6 @@
 from multiprocessing import Process, Manager
 from multiprocessing.managers import *
+from datetime import datetime
 import pandas as pd
 from pandas import DataFrame
 import cx_Oracle
@@ -55,6 +56,25 @@ def distance2D(xii,xi,yii,yi):
     sq2 = (yi-yii)*(yi-yii)
     return math.sqrt(sq1 + sq2)
 
+def DistanceTraveled(df,user,startdate,finishdate):
+    count=df.rowcount()
+    d=0.0
+    for i in range(count-1):
+        if df.getID(i)==user:
+            # print(df.getDate(i),startdate)
+            # print("---")
+            if df.getDate(i)>=startdate and df.getDate(i)<=finishdate:
+                print(df.getINDEX(i))
+                x1 = df.getX(i)
+                y1 = df.getY(i)
+                x2 = df.getX(i+1)
+                y2 = df.getY(i+1)
+                d2 = distance2D(x1,x2,y1,y2)
+                d = d + d2
+        #print(d2,r.distanceFromLastPoint(i+1))
+        #print(d2,r.getINDEX(i))
+    return d
+
 if __name__ == '__main__':
     df=getDataFrame()
     #print(df.head())
@@ -65,15 +85,15 @@ if __name__ == '__main__':
     pExportToCSV(dfSortedByIndex,"DataAfterSortDate")
 
     r=Reactionalytics(dfSortedByDate)
-    count=r.rowcount()
-    d=0.0
-    for i in range(count-1):
-        x1 = r.getX(i)
-        y1 = r.getY(i)
-        x2 = r.getX(i+1)
-        y2 = r.getY(i+1)
-        d2 = distance2D(x1,x2,y1,y2)
-        d = d + d2
-        #print(d2,r.distanceFromLastPoint(i+1))
-        #print(d2,r.getINDEX(i))
+
+    StartDate = pd.to_datetime("2018-02-09 15:53:26.376000")
+    EndDate = pd.to_datetime('2018-02-09 15:59:11.8000000')
+    print(dfSortedByDate['Date'])
+    print('End of print and start of new df')
+    dfCurrentEvent = (dfSortedByDate['Date']>=StartDate)&(dfSortedByDate['Date']<=EndDate)
+    r2=Reactionalytics(dfSortedByDate[dfCurrentEvent])
+    print(dfSortedByDate[dfCurrentEvent])
+    d=DistanceTraveled(r,1,StartDate,EndDate)
+    print("Total Distance = ", d)
+    d=DistanceTraveled(r2,1,StartDate,EndDate)
     print("Total Distance = ", d)
