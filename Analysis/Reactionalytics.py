@@ -1,7 +1,3 @@
-from multiprocessing import Process, Manager
-from multiprocessing.managers import *
-from datetime import datetime
-import pandas as pd
 from pandas import DataFrame
 import cx_Oracle
 import os
@@ -27,6 +23,7 @@ class Reactionalytics:
         self.cCol4LocX = 3
         self.cCol4LocY = 4
         self.cCol4LocZ = 5
+        self.cCol4TargetVisible = 6
         self.cCol4Hostility = 6
         self.cCol4Hit = 7
         self.cCol4HeartRate = 8
@@ -56,14 +53,25 @@ class Reactionalytics:
         database = cx_Oracle.connect(DatabaseInfo[self.cDB_UserPos], DatabaseInfo[self.cDB_PWPos], dsn_tns)
         cursor = database.cursor()
 
-        sSQLCMD = 'Select s.S_INDEX,s.S_DATE,s.S_SHOOTER.Id,s.S_SHOOTER.Loc.x,s.S_SHOOTER.Loc.y,s.S_SHOOTER.Loc.z,'
+        sSQLCMD = '(Select s.S_INDEX,s.S_DATE as time, s.S_SHOOTER.Id,s.S_SHOOTER.Loc.x,s.S_SHOOTER.Loc.y,s.S_SHOOTER.Loc.z,'
         sSQLCMD = sSQLCMD + 's.S_SHOOTER.hostility,s.S_SHOOTER.hit,s.S_SHOOTER.hr,s.S_SHOOTER.arm.emg.emg0,' \
                             's.S_SHOOTER.arm.emg.emg1,s.S_SHOOTER.arm.emg.emg2,' \
                             's.S_SHOOTER.arm.emg.emg3,s.S_SHOOTER.arm.emg.emg4,s.S_SHOOTER.arm.emg.emg5,' \
                             's.S_SHOOTER.arm.emg.emg6,s.S_SHOOTER.arm.emg.emg7,s.S_SHOOTER.arm.roll,' \
                             's.S_SHOOTER.arm.pitch,s.S_SHOOTER.arm.heading,s.S_SHOOTER.shot,s.S_SHOOTER.body.heading,' \
                             's.S_SHOOTER.body.roll,s.S_SHOOTER.body.pitch,s.S_SHOOTER.head.heading,s.S_SHOOTER.head.roll,' \
-                            's.S_SHOOTER.head.pitch FROM Shooter_Table s'
+                            's.S_SHOOTER.head.pitch ' \
+                            'FROM Shooter_Table s )' \
+                            'UNION ALL' \
+                            '(SELECT t.T_INDEX, t.T_DATE AS time, t.T_TARGET.ID AS id, t.T_TARGET.Loc.x AS x, t.T_TARGET.Loc.y AS y, ' \
+                            't.T_TARGET.Loc.Z AS z, ' \
+                            't.T_TARGET.visible AS visible, t.T_TARGET.hit AS hit, NULL AS Hostility, ' \
+                            'NULL AS emg0, NULL AS emg1, NULL AS emg2, NULL AS emg3, NULL AS emg4, NULL AS emg5, NULL AS emg6, NULL AS emg7, ' \
+                            'NULL AS ARM_ROLL, NULL AS ARM_PITCH, NULL AS ARM_Heading, ' \
+                            'NULL AS Body_ROLL, NULL AS Body_PITCH, NULL AS Body_Heading, ' \
+                            'NULL AS Head_ROLL, NULL AS Head_PITCH, NULL AS Head_Heading, ' \
+                            'NULL AS HR ' \
+                            'FROM Target_Table t) ORDER BY time'
                             # 'WHERE s.S_DATE > ''17-MAR-18 04.00.00.00'' AND s.S_DATE < ''01-MAR-18 04.00.00.00'' '
         # 'WHERE s.S_DATE > ' + str(StartDate) + ' AND s.S_DATE < ' + str(EndDate) + ''
         # print(sSQLCMD)
@@ -87,6 +95,7 @@ class Reactionalytics:
         self.cCol4LocX = 3
         self.cCol4LocY = 4
         self.cCol4LocZ = 5
+        self.cCol4TargetVisible = 6
         self.cCol4Hostility = 6
         self.cCol4Hit = 7
         self.cCol4HeartRate = 8
@@ -137,7 +146,9 @@ class Reactionalytics:
         return self.df.iat[row, self.cCol4Date]
 
     def getINDEX(self, row):
+        #flaw until target and shooter get same index sequence  -- i.e there could be 2 indentical indices in the df
         return self.df.iat[row, self.cCol4INDEX]
+
 
     def getID(self, row):
         return self.df.iat[row, self.cCol4Id]
@@ -154,6 +165,10 @@ class Reactionalytics:
 
     def getHostility(self, row):
         return self.df.iat[row, self.cCol4Hostility]
+
+    def getTargetVisible(self, row):
+        return self.df.iat[row, self.cCol4TargetVisible]
+
 
     def getHit(self, row):
         return self.df.iat[row, self.cCol4Hit]
@@ -251,28 +266,36 @@ class Reactionalytics:
         sq2 = (yi-yii)*(yi-yii)
         return math.sqrt(sq1 + sq2)
 
+    def TotalDistanceTraveled(self,user):
+        d=self.DistanceTraveled(user,self.classStartDate,self.classEndDate)
+        return d
+
     def DistanceTraveled(self,user,startdate,finishdate):
+        NotFirst=False
         count=self.rowcount()
-        #print("Count=",count)
-        #print(startdate,finishdate)
+        diff=finishdate-startdate
+        #print("Count = ",count)
+        #print("StartDate=", startdate, " --  Finish Date=", finishdate, " --> Elasped Time=",diff)
         d=0.0
-        for i in range(count-1):
+        for i in range(count):
             if self.getID(i)==user:
                 # print(self.getDate(i),startdate)
-                # print("---")
-                if self.getDate(i)>=startdate and self.getDate(i)<=finishdate:
-                    #print(self.getINDEX(i))
-                    x1 = self.getX(i)
-                    y1 = self.getY(i)
-                    x2 = self.getX(i+1)
-                    y2 = self.getY(i+1)
-                    d2 = self.distance2D(x1,x2,y1,y2)
-                    d = d + self.distanceFromLastPoint(i+1)
+                #print("---",i)
+                if (self.getDate(i)>=startdate) and (self.getDate(i)<=finishdate):
+                    #print(self.getINDEX(i),self.getX(i),self.getY(i))
+                    if NotFirst:
+                        x1 = self.getX(i-1)
+                        y1 = self.getY(i-1)
+                        x2 = self.getX(i)
+                        y2 = self.getY(i)
+                        d2 = self.distance2D(x1,x2,y1,y2)
+                        d = d + self.distanceFromLastPoint(i)
+                    NotFirst=True
             #print(d2,r.distanceFromLastPoint(i+1))
             #print(d2,r.getINDEX(i))
         return d
 
-    def getTotalShotCount(self,user):
+    def getTotalShotCountForUser(self,user):
         count=self.rowcount()
         d=0.0
         for i in range(count-1):
@@ -281,26 +304,60 @@ class Reactionalytics:
                     d=d+1
         return d
 
-    def getShotsBeforeIndex(self, row):
+    def getShotsBeforeRowByUser(self, row, user):
+        count=self.rowcount()
+        d=-1.0     # -1 reports a failure
+        if row<=count:
+            d = 0
+            for i in range(row-1):
+                if self.getID(i)==user:
+                    if self.getShot(i)!=0:
+                        d=d+1
+        if d<0:
+            print("Error ", d, " in getShotsBeforeRowByUser: Row = ", row, " Count = ", count)
+        return d
+
+    def getHitsBeforeRowByUser(self, row):
         return -1
 
-    def getHitsBeforeIndex(self, row):
+    def getHitMissRatioBeforeRowByUser(self, row, user):
         return -1
 
-    def getHitMissRatioBeforeIndex(self, row):
+    def getAvgReactionTimeBeforeRowByUser(self, row, user):
         return -1
 
-    def getAvgReactionTimeBeforeIndex(self, row):
-        return -1
-
-    def getDistanceBeforeIndex(self, row):
-        return -1
+    def getDistanceBeforeRowByUser(self, row, user):
+        NotFirst=False
+        count=self.rowcount()
+        d=-1.0     # -1 reports a failure
+        if row<=count:
+            d = 0
+            for i in range(row):
+                if self.getID(i)==user:
+                    #print(self.getINDEX(i),self.getX(i),self.getY(i))
+                    if NotFirst:
+                        x1 = self.getX(i-1)
+                        y1 = self.getY(i-1)
+                        x2 = self.getX(i)
+                        y2 = self.getY(i)
+                        d2 = self.distance2D(x1,x2,y1,y2)
+                        d = d + self.distanceFromLastPoint(i)
+                    NotFirst=True
+        if d<0:
+            print("Error ", d, " in getDistanceBeforeRowByUser: Row = ", row, " Count = ", count)
+        return d
 
     def sortByDate(self):
         self.df = self.df.sort_values('Date', ascending=True)
 
     def sortByIndex(self):
         self.df = self.df.sort_values('INDEX', ascending=True)
+
+    def getTotalNumberOfUsers(self):
+        return -1
+
+    def getTotalNumberOfTargets(self):
+        return -1
 
     def ExportToCSV(self,sFileName):
         dir_path = os.path.dirname(os.path.realpath("__file__"))
