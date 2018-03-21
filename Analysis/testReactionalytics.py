@@ -55,6 +55,10 @@ if __name__ == '__main__':
     print("Total Shot count for user = ", totalShotCount)
     print("Shot count before row 30 = ", ShotsUptoRow30)
     print("Shot count before row 39 = ", ShotsUptoRow39)
+    print("Max X",testEvent1.getMaxX())
+    print("Min X",testEvent1.getMinX())
+    print("Max Y",testEvent1.getMaxY())
+    print("Min Y",testEvent1.getMinY())
 
     # Test 2 - showing 2 lines in Database
     StartDate = pd.to_datetime("2018-02-09 15:53:26.376000")
@@ -93,3 +97,8 @@ if __name__ == '__main__':
     print("Shot count before row 30 = ", ShotsUptoRow30)
     print("Shot count before row 39 = ", ShotsUptoRow39)
     print("Shot count before row 2 = ", ShotsUptoRow2)
+    print("Max X",testEvent2.getMaxX())
+    print("Min X",testEvent2.getMinX())
+    print("Max Y",testEvent2.getMaxY())
+    print("Min Y",testEvent2.getMinY())
+

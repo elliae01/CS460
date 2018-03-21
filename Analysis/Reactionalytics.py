@@ -371,3 +371,37 @@ class Reactionalytics:
             print("Could not save " + sFileName)
             pass
         return 0
+
+    def getMaxX(self):
+        count = self.rowcount()
+        MaxVal = -99999999
+        for i in range(count):
+            if MaxVal < self.getX(i):
+                MaxVal = self.getX(i)
+        return MaxVal
+
+    def getMaxY(self):
+        count = self.rowcount()
+        MaxVal = -99999999
+        for i in range(count):
+            if MaxVal < self.getY(i):
+                MaxVal = self.getY(i)
+        return MaxVal
+
+    def getMinX(self):
+        count = self.rowcount()
+        MinVal = 99999999
+        for i in range(count):
+            if MinVal > self.getX(i):
+                MinVal = self.getX(i)
+        return MinVal
+
+    def getMinY(self):
+        count = self.rowcount()
+        MinVal = 99999999
+        for i in range(count):
+            if MinVal > self.getY(i):
+                MinVal = self.getY(i)
+        return MinVal
+
+
