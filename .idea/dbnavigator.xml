@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DataExportManager">
@@ -22,11 +22,31 @@
   <component name="DBNavigator.Project.DatabaseBrowserManager">
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
-    <show-object-properties value="true" />
+    <show-object-properties value="false" />
     <loaded-nodes />
   </component>
+  <component name="DBNavigator.Project.DatabaseConsoleManager">
+    <connection id="2860bd4d-7d2b-4726-b172-a19460c356d3">
+      <console name="Connection" type="STANDARD" />
+    </connection>
+  </component>
+  <component name="DBNavigator.Project.DatabaseSessionManager">
+    <connection id="2860bd4d-7d2b-4726-b172-a19460c356d3" />
+  </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-list connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" dataset="SYSMAN.TARGET_TABLE" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" dataset="SYSMAN.EMG_TABLE" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" dataset="SYSMAN.SHOOTER_TABLE" active-filter-id="EMPTY_FILTER" />
+  </component>
   <component name="DBNavigator.Project.EditorStateManager">
-    <last-used-providers />
+    <last-used-providers>
+      <object-type object-type="TYPE" editor-provider="CODE_SPEC" />
+    </last-used-providers>
+  </component>
+  <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/Mark/targaexport.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
+    <mapping file-url="file://$PROJECT_DIR$/Mark/Import csv.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
+    <mapping file-url="file://$PROJECT_DIR$/Server/LocalDB.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="TARGABOT" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
@@ -44,10 +64,107 @@
     <filters />
   </component>
   <component name="DBNavigator.Project.ScriptExecutionManager" clear-outputs="true">
-    <recently-used-interfaces />
+    <recently-used-interfaces>
+      <mapping database-type="ORACLE" interface-id="DEFAULT" />
+    </recently-used-interfaces>
   </component>
   <component name="DBNavigator.Project.Settings">
-    <connections />
+    <connections>
+      <connection id="2860bd4d-7d2b-4726-b172-a19460c356d3" active="true">
+        <database>
+          <name value="Targamite" />
+          <description value="" />
+          <database-type value="ORACLE" />
+          <config-type value="BASIC" />
+          <database-version value="11.2" />
+          <driver-source value="BUILTIN" />
+          <driver-library value="" />
+          <driver value="" />
+          <url-type value="SID" />
+          <host value="localhost" />
+          <port value="1521" />
+          <database value="ORCL" />
+          <os-authentication value="false" />
+          <empty-password value="false" />
+          <user value="sysman" />
+          <password value="U3lzdGVtX0FkbWluMQ==" />
+        </database>
+        <properties>
+          <auto-commit value="false" />
+        </properties>
+        <ssh-settings>
+          <active value="false" />
+          <proxy-host value="" />
+          <proxy-port value="22" />
+          <proxy-user value="" />
+          <proxy-password value="" />
+          <auth-type value="PASSWORD" />
+          <key-file value="" />
+          <key-passphrase value="" />
+        </ssh-settings>
+        <details>
+          <charset value="UTF-8" />
+          <session-management value="true" />
+          <ddl-file-binding value="true" />
+          <database-logging value="false" />
+          <connect-automatically value="true" />
+          <restore-workspace value="true" />
+          <restore-workspace-deep value="true" />
+          <environment-type value="default" />
+          <idle-time-to-disconnect value="60" />
+          <password-expiry-time value="10" />
+          <max-connection-pool-size value="7" />
+          <alternative-statement-delimiter value="" />
+        </details>
+        <object-filters hide-empty-schemas="false">
+          <object-type-filter use-master-settings="true">
+            <object-type name="SCHEMA" enabled="true" />
+            <object-type name="USER" enabled="true" />
+            <object-type name="ROLE" enabled="true" />
+            <object-type name="PRIVILEGE" enabled="true" />
+            <object-type name="CHARSET" enabled="true" />
+            <object-type name="TABLE" enabled="true" />
+            <object-type name="VIEW" enabled="true" />
+            <object-type name="MATERIALIZED_VIEW" enabled="true" />
+            <object-type name="NESTED_TABLE" enabled="true" />
+            <object-type name="COLUMN" enabled="true" />
+            <object-type name="INDEX" enabled="true" />
+            <object-type name="CONSTRAINT" enabled="true" />
+            <object-type name="DATASET_TRIGGER" enabled="true" />
+            <object-type name="DATABASE_TRIGGER" enabled="true" />
+            <object-type name="SYNONYM" enabled="true" />
+            <object-type name="SEQUENCE" enabled="true" />
+            <object-type name="PROCEDURE" enabled="true" />
+            <object-type name="FUNCTION" enabled="true" />
+            <object-type name="PACKAGE" enabled="true" />
+            <object-type name="TYPE" enabled="true" />
+            <object-type name="TYPE_ATTRIBUTE" enabled="true" />
+            <object-type name="ARGUMENT" enabled="true" />
+            <object-type name="DIMENSION" enabled="true" />
+            <object-type name="CLUSTER" enabled="true" />
+            <object-type name="DBLINK" enabled="true" />
+          </object-type-filter>
+          <object-name-filters>
+            <filter join-type="OR" object-type="type">
+              <simple-condition operator="EQUAL" text="Emg_Obj" />
+              <simple-condition operator="EQUAL" text="Orient_Obj" />
+              <simple-condition operator="EQUAL" text="Arm_Obj" />
+              <simple-condition operator="EQUAL" text="Loc_Obj" />
+              <simple-condition operator="EQUAL" text="UserInfo" />
+              <simple-condition operator="EQUAL" text="Shooter" />
+              <simple-condition operator="EQUAL" text="Target" />
+              <simple-condition operator="EQUAL" text="Entity" />
+            </filter>
+            <filter join-type="OR" object-type="table">
+              <simple-condition operator="EQUAL" text="SHOOTER_TABLE" />
+              <simple-condition operator="EQUAL" text="Target_Table" />
+              <simple-condition operator="EQUAL" text="Emg_Table" />
+              <simple-condition operator="EQUAL" text="Emg" />
+            </filter>
+          </object-name-filters>
+        </object-filters>
+      </connection>
+    </connections>
     <browser-settings>
       <general>
         <display-mode value="TABBED" />
@@ -189,6 +306,8 @@
       <general>
         <show-object-navigation-gutter value="false" />
         <show-spec-declaration-navigation-gutter value="true" />
+        <enable-spellchecking value="true" />
+        <enable-reference-spellchecking value="false" />
       </general>
       <confirmations>
         <save-changes value="false" />

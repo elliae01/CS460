@@ -133,3 +133,14 @@ if __name__ == '__main__':
     print("Total Number of Targets = ", testEvent2.getTotalNumberOfTargets())
     print("Total Number of Shooters = ", testEvent2.getTotalNumberOfShooters())
 
+    # Test 3 - showing 2 lines in Database
+    StartDate = pd.to_datetime('2018-03-17 16:07:00.000')
+    EndDate = pd.to_datetime('2018-03-17 16:59:12.000')
+
+    # Create Event 3
+    print("------------------------------------------------------------")
+    print("testEvent3...Created using Dates ",StartDate," through ",EndDate,"  --> Elasped Time=",(EndDate-StartDate))
+    testEvent3=Reactionalytics(DatabaseInfo, StartDate, EndDate)
+    print("Total Number of actors in event = ", testEvent3.getTotalNumberOfActors())
+    print("Total Number of Targets = ", testEvent3.getTotalNumberOfTargets())
+    print("Total Number of Shooters = ", testEvent3.getTotalNumberOfShooters())

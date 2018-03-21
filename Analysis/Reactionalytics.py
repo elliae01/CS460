@@ -405,7 +405,17 @@ class Reactionalytics:
     def getMinY(self):
         return self.df['Loc.y'].min()
 
+    def getTargetLocationByID(self,user):
+        dfCurrentEvent = (self.df['Id'] == user)
+        df=self.df[dfCurrentEvent]
+        x=df.iat[0, self.cCol4LocX]
+        y=df.iat[0, self.cCol4LocY]
+        # print(df.iat[0, self.cCol4LocX],df.iat[0, self.cCol4LocY])
+        return x,y
+
     def getReactionTimeBeforeRowByUser(self, row, user):
+        count=self.rowcount()
+
         return -1
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):
