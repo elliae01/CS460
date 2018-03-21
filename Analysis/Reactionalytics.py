@@ -373,35 +373,15 @@ class Reactionalytics:
         return 0
 
     def getMaxX(self):
-        count = self.rowcount()
-        MaxVal = -99999999
-        for i in range(count):
-            if MaxVal < self.getX(i):
-                MaxVal = self.getX(i)
-        return MaxVal
+        return self.df['Loc.x'].max()
 
     def getMaxY(self):
-        count = self.rowcount()
-        MaxVal = -99999999
-        for i in range(count):
-            if MaxVal < self.getY(i):
-                MaxVal = self.getY(i)
-        return MaxVal
+        return self.df['Loc.y'].max()
 
     def getMinX(self):
-        count = self.rowcount()
-        MinVal = 99999999
-        for i in range(count):
-            if MinVal > self.getX(i):
-                MinVal = self.getX(i)
-        return MinVal
+        return self.df['Loc.x'].min()
 
     def getMinY(self):
-        count = self.rowcount()
-        MinVal = 99999999
-        for i in range(count):
-            if MinVal > self.getY(i):
-                MinVal = self.getY(i)
-        return MinVal
+        return self.df['Loc.y'].min()
 
 
