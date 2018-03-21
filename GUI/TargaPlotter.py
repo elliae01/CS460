@@ -33,6 +33,8 @@ def runPygame(x, y):
 	leftTarget = False
 	rightTarget = False
 
+	move = 1
+
 	tracers = []
 	while True:  # dataStruct.getRun()
 		# xLoc = noneRemover(dataStruct.getLocationXAxis())
@@ -82,10 +84,11 @@ def runPygame(x, y):
 			if event.type == pygame.QUIT:
 				exit_handler()
 
-		display(locSymbol, gameDisplay, x, y, heading, targetSymbol, topTarget,
+		display(locSymbol, gameDisplay, x, y+move, heading, targetSymbol, topTarget,
 				bottomTarget, rightTarget,
 				leftTarget, display_width, display_height, tracers)
 		clock.tick(150)
+		move = move + 1
 
 	print("Pygame window closing", flush=True)
 	exit_handler()
@@ -115,6 +118,12 @@ def display(locSymbol, gameDisplay, x, y, heading, targetSymbol, topTarget, bott
 
 	# Prints the new symbol in the x and y location supplied
 	placeSymbol(gameDisplay,locSymbol, x, y)
+
+	placeSymbol(gameDisplay, targetSymbol, -300,0)
+	placeSymbol(gameDisplay, targetSymbol, -500,100)
+	placeSymbol(gameDisplay, targetSymbol, -900,0)
+	placeSymbol(gameDisplay, targetSymbol, -100,500)
+	placeSymbol(gameDisplay, targetSymbol, 100,-300)
 
 	# Updates the Pygame Display
 	pygame.display.update()  # Rotates the symbol on the Pygame Window to reflect the heading supplied #
@@ -157,7 +166,6 @@ def exit_handler():
 
 	# Defines the symbol we use to illustrate location within Pygame #
 def placeSymbol(gameDisplay,newImg, x, y):
-	area = TargaPlotter(0, 0, 700 - 20, 700 - 20)
 	gameDisplay.blit(newImg, area.plot(x,y))
 
 class TargaPlotter:
@@ -169,46 +177,76 @@ class TargaPlotter:
 		self.y = y
 		self.w = w
 		self.h = h
-		self.doLimitBounds = True
+		self.doAutoScale = True
 		self.setOrigin(self.x+(self.w/2), self.y+(self.h/2))
+		self.scale = 1
 
 	def setOrigin(self, x, y):
 		self.origin = (x, y)
 
-	def setDoLimitBounds(self, val):
-		self.doLimitBounds = val
+	def setScale(self, scale):
+		self.scale = scale
 
-	def limitBounds(self, x, y):
-		if(self.doLimitBounds):
-			if(x <= self.x):
-				x = self.x
-			if(x >= (self.x+self.w)):
-				x = (self.x+self.w)
-			if(y <= self.y):
-				y = self.y
-			if(y >= (self.y+self.h)):
-				y = (self.y+self.h)
-		return (x,y)
+	def setDoLimitBounds(self, val):
+		self.doAutoScale = val
+
+	def autoScale(self, x, y):
+		x = x * self.scale
+		y = y * self.scale
+		newScale = self.scale
+		if(self.doAutoScale):
+			if(x < -(self.origin[0] - self.x)):
+				newScale = abs((self.origin[0] - self.x) / x)
+				if(newScale < self.scale):
+					self.scale = newScale
+			if(x > ((self.x + self.w)) - self.origin[0]):
+				newScale = abs(((self.x + self.w) - self.origin[0]) / x)
+				if(newScale < self.scale):
+					self.scale = newScale
+			if(y < -(self.origin[1] - self.y)):
+				newScale = abs((self.origin[1] - self.y) / y)
+				if(newScale < self.scale):
+					self.scale = newScale
+			if(y > ((self.y + self.h)) - self.origin[1]):
+				newScale = abs(((self.y + self.h) - self.origin[1]) / y)
+				if(newScale < self.scale):
+					self.scale = newScale
+		return (x*self.scale, y*self.scale)
+
+	# def limitBounds(self, x, y):
+	# 	if(self.doAutoScale):
+	# 		if(x <= self.x):
+	# 			x = self.x
+	# 		if(x >= (self.x+self.w)):
+	# 			x = (self.x+self.w)
+	# 		if(y <= self.y):
+	# 			y = self.y
+	# 		if(y >= (self.y+self.h)):
+	# 			y = (self.y+self.h)
+	# 	return (x,y)
 
 	def plot(self, x, y):
+		(x, y) = self.autoScale(x, y)
 		x = self.origin[0]+x
 		y = self.origin[1]-y
-		return self.limitBounds(x,y)
+		return (x, y)
 
 if __name__ == '__main__':
+	global area
+	area = TargaPlotter(0, 0, 600, 600)
+
 	# Examples
 
-	# set the plotting area top left corner to (20,100) in pygame coordinates and set width and height
+	# # set the plotting area top left corner to (20,100) in pygame coordinates and set width and height
 	area1 = TargaPlotter(20, 120, 60, 400)
 	print(area1.plot(40, 300))	# The function "plot" takes in coordinates relative to the origin you
-								# set (by default the center of the plotting rectangle if you don't set) and
-								# outputs a point pygame understands.
+	# 							# set (by default the center of the plotting rectangle if you don't set) and
+	# 							# outputs a point pygame understands.
 
 	# Check console for output of above
 
 	# Implemented in pygame to limit display within a box.
 	# Change doLimitBounds = False if want symbols able to move outside of edges.
-	runPygame(900,900)	# change x and y to move symbol
+	runPygame(0,0)	# change x and y to move symbol
 	# notice how the TargaPlotter is implemented in the PlaceSymbol method so
 	# that everything drawn in that "area' automatically is converted
-
