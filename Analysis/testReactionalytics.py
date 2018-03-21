@@ -47,6 +47,8 @@ if __name__ == '__main__':
     DistUptoRow39=testEvent1.getDistanceBeforeRowByUser(39, 1)
     ShotsUptoRow30=testEvent1.getShotsBeforeRowByUser(30,1)
     ShotsUptoRow39=testEvent1.getShotsBeforeRowByUser(39,1)
+    HitsUptoRow30 = testEvent1.getHitsBeforeRowByUser(30,1)
+    HitsUptoRow39 = testEvent1.getHitsBeforeRowByUser(39,1)
     print("Distance traveled during playback up to row 30 = ", DistUptoRow30,
           "(Expected: 2.8284271247461903 -- H16)")
     print("Distance traveled during playback up to row 39 = ", DistUptoRow39,
@@ -55,14 +57,26 @@ if __name__ == '__main__':
     print("Total Shot count for user = ", totalShotCount)
     print("Shot count before row 30 = ", ShotsUptoRow30)
     print("Shot count before row 39 = ", ShotsUptoRow39)
+    print("Hit count before row 30 = ", HitsUptoRow30)
+    print("Hit count before row 39 = ", HitsUptoRow39)
+    HitMissRatioUptoRow30=testEvent1.getHitMissRatioBeforeRowByUser(30,1)
+    HitMissRatioUptoRow39=testEvent1.getHitMissRatioBeforeRowByUser(39,1)
+    print("Hit/miss ratio before row 30 = ", HitMissRatioUptoRow30)
+    print("Hit/miss ratio before row 39 = ", HitMissRatioUptoRow39)
     print("Max X",testEvent1.getMaxX())
     print("Min X",testEvent1.getMinX())
     print("Max Y",testEvent1.getMaxY())
     print("Min Y",testEvent1.getMinY())
+    print("Total Number of actors in event = ", testEvent1.getTotalNumberOfActors())
+    print("Total Number of Targets = ", testEvent1.getTotalNumberOfTargets())
+    print("Total Number of Shooters = ", testEvent1.getTotalNumberOfShooters())
 
     # Test 2 - showing 2 lines in Database
-    StartDate = pd.to_datetime("2018-02-09 15:53:26.376000")
-    EndDate = pd.to_datetime('2018-02-09 15:59:11.8000000')
+    StartDate = pd.to_datetime('2018-02-09 15:53:36.070')
+    EndDate = pd.to_datetime('2018-02-09 15:59:11.789')
+
+    # EndDate = StartDate
+    # StartDate = pd.to_datetime('2018-02-09 15:52:56.963')
 
     # Create Event 2
     print("------------------------------------------------------------")
@@ -97,8 +111,25 @@ if __name__ == '__main__':
     print("Shot count before row 30 = ", ShotsUptoRow30)
     print("Shot count before row 39 = ", ShotsUptoRow39)
     print("Shot count before row 2 = ", ShotsUptoRow2)
+    HitsUptoRow30 = testEvent2.getHitsBeforeRowByUser(30,1)
+    HitsUptoRow39 = testEvent2.getHitsBeforeRowByUser(39,1)
+    HitsUptoRow1 = testEvent2.getHitsBeforeRowByUser(1,1)
+    HitsUptoRow2 = testEvent2.getHitsBeforeRowByUser(2,1)
+    print("Hit count before row 30 = ", HitsUptoRow30)
+    print("Hit count before row 39 = ", HitsUptoRow39)
+    print("Hit count before row 1 = ", HitsUptoRow1)
+    print("Hit count before row 2 = ", HitsUptoRow2)
+    HitMissRatioUptoRow30=testEvent2.getHitMissRatioBeforeRowByUser(30,1)
+    HitMissRatioUptoRow39=testEvent2.getHitMissRatioBeforeRowByUser(39,1)
+    HitMissRatioUptoRow2=testEvent2.getHitMissRatioBeforeRowByUser(2,1)
+    print("Hit/miss ratio before row 30 = ", HitMissRatioUptoRow30)
+    print("Hit/miss ratio before row 39 = ", HitMissRatioUptoRow39)
+    print("Hit/miss ratio before row 2 = ", HitMissRatioUptoRow2)
     print("Max X",testEvent2.getMaxX())
     print("Min X",testEvent2.getMinX())
     print("Max Y",testEvent2.getMaxY())
     print("Min Y",testEvent2.getMinY())
+    print("Total Number of actors in event = ", testEvent2.getTotalNumberOfActors())
+    print("Total Number of Targets = ", testEvent2.getTotalNumberOfTargets())
+    print("Total Number of Shooters = ", testEvent2.getTotalNumberOfShooters())
 

@@ -8,6 +8,7 @@ print("Hello, Welcome to Reactionalytics.py")
 
 class Reactionalytics:
     df = None
+    dfReaction = None
 
     def __init__(self, DatabaseInfo, StartDate, EndDate):
         self.classStartDate=StartDate
@@ -309,7 +310,7 @@ class Reactionalytics:
         d=-1.0     # -1 reports a failure
         if row<=count:
             d = 0
-            for i in range(row-1):
+            for i in range(row):
                 if self.getID(i)==user:
                     if self.getShot(i)!=0:
                         d=d+1
@@ -317,14 +318,27 @@ class Reactionalytics:
             print("Error ", d, " in getShotsBeforeRowByUser: Row = ", row, " Count = ", count)
         return d
 
-    def getHitsBeforeRowByUser(self, row):
-        return -1
+    def getHitsBeforeRowByUser(self, row, user):
+        count=self.rowcount()
+        d=-1.0     # -1 reports a failure
+        if row<=count:
+            d = 0
+            for i in range(row):
+                if self.getID(i)==user:
+                    if self.getHit(i)!=0:
+                        d=d+1
+        if d<0:
+            print("Error ", d, " in getShotsBeforeRowByUser: Row = ", row, " Count = ", count)
+        return d
 
     def getHitMissRatioBeforeRowByUser(self, row, user):
-        return -1
-
-    def getAvgReactionTimeBeforeRowByUser(self, row, user):
-        return -1
+        count=self.rowcount()
+        if row > count:
+            print("Error ", -1 , " in getHitMissRatioBeforeRowByUser: Row = ", row, " Count = ", count)
+            return -1
+        hits=self.getHitsBeforeRowByUser(row,user)
+        miss=self.getShotsBeforeRowByUser(row,user)
+        return hits/miss
 
     def getDistanceBeforeRowByUser(self, row, user):
         NotFirst=False
@@ -353,11 +367,18 @@ class Reactionalytics:
     def sortByIndex(self):
         self.df = self.df.sort_values('INDEX', ascending=True)
 
-    def getTotalNumberOfUsers(self):
-        return -1
+    def getTotalNumberOfActors(self):
+        return self.df['Id'].nunique()
+
+    def getTotalNumberOfShooters(self):
+        dfCurrentEvent = (self.df['Id'] < 100)
+        df=self.df[dfCurrentEvent]
+        return df['Id'].nunique()
 
     def getTotalNumberOfTargets(self):
-        return -1
+        dfCurrentEvent = (self.df['Id'] > 100)
+        df=self.df[dfCurrentEvent]
+        return df['Id'].nunique()
 
     def ExportToCSV(self,sFileName):
         dir_path = os.path.dirname(os.path.realpath("__file__"))
@@ -384,4 +405,9 @@ class Reactionalytics:
     def getMinY(self):
         return self.df['Loc.y'].min()
 
+    def getReactionTimeBeforeRowByUser(self, row, user):
+        return -1
+
+    def getAvgReactionTimeBeforeRowByUser(self, row, user):
+        return -1
 
