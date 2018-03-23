@@ -25,6 +25,8 @@ class UserInformation:
     hostile = None
     hit = None
     run = None
+    writing = None
+    timestamp = None
 
         # CONSTRUCTOR
     def __init__(self,Id):
@@ -82,6 +84,10 @@ class UserInformation:
         self.hit = newHit
     def setRun(self, newRun):
         self.run = newRun
+    def setWriting(self, newWriting):
+        self.writing = newWriting
+    def setTimestamp(self,newTimestamp):
+        self.timestamp = newTimestamp
 
             # GETTERS
     def getId(self):
@@ -134,3 +140,7 @@ class UserInformation:
         return self.hit
     def getRun(self):
         return self.run
+    def getWriting(self):
+        return self.writing
+    def getTimestamp(self):
+        return self.timestamp

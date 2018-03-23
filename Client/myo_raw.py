@@ -1,12 +1,3 @@
-'''
-	Original by dzhu
-		https://github.com/dzhu/myo-raw
-
-	Edited by Fernando Cosentino
-		http://www.fernandocosentino.net/pyoconnect
-'''
-
-
 from __future__ import print_function
 
 import enum
@@ -23,11 +14,11 @@ from UserInformation import *
 
 
 def multichr(ords):
-
     if sys.version_info[0] >= 3:
         return bytes(ords)
     else:
         return ''.join(map(chr, ords))
+
 
 def multiord(b):
     if sys.version_info[0] >= 3:
@@ -35,15 +26,18 @@ def multiord(b):
     else:
         return map(ord, b)
 
+
 class Arm(enum.Enum):
     UNKNOWN = 0
-    RIGHT = 2
-    LEFT = 1
+    RIGHT = 1
+    LEFT = 2
+
 
 class XDirection(enum.Enum):
     UNKNOWN = 0
     X_TOWARD_WRIST = 1
     X_TOWARD_ELBOW = 2
+
 
 class Pose(enum.Enum):
     REST = 0
@@ -52,8 +46,9 @@ class Pose(enum.Enum):
     WAVE_OUT = 3
     FINGERS_SPREAD = 4
     THUMB_TO_PINKY = 5
-    UNKNOWN = 255	 
-    
+    UNKNOWN = 255
+
+
 class Packet(object):
     def __init__(self, ords):
         self.typ = ords[0]
@@ -63,12 +58,13 @@ class Packet(object):
 
     def __repr__(self):
         return 'Packet(%02X, %02X, %02X, [%s])' % \
-            (self.typ, self.cls, self.cmd,
-             ' '.join('%02X' % b for b in multiord(self.payload)))
+               (self.typ, self.cls, self.cmd,
+                ' '.join('%02X' % b for b in multiord(self.payload)))
 
 
 class BT(object):
     '''Implements the non-Myo-specific details of the Bluetooth protocol.'''
+
     def __init__(self, tty):
         self.ser = serial.Serial(port=tty, baudrate=9600, dsrdtr=1)
         self.buf = []
@@ -123,19 +119,22 @@ class BT(object):
             h(p)
 
     def add_handler(self, h):
-        
+
         self.handlers.append(h)
-        
 
     def remove_handler(self, h):
-        try: self.handlers.remove(h)
-        except ValueError: pass
+        try:
+            self.handlers.remove(h)
+        except ValueError:
+            pass
 
     def wait_event(self, cls, cmd):
         res = [None]
+
         def h(p):
             if p.cls == cls and p.cmd == cmd:
                 res[0] = p
+
         self.add_handler(h)
         while res[0] is None:
             self.recv_packet()
@@ -178,6 +177,8 @@ class BT(object):
 
             ## not a response: must be an event
             self.handle_event(p)
+
+
 '''            
 Global variables to transport data out of while loop into other functions
 Used in case multiple threads are used from another module, the individual
@@ -190,11 +191,14 @@ accelerometer = []
 pistalGrip = False
 emg2 = 1
 emg3 = 1
+val2 = None
 emg4 = []
 roll = 1
 pitch = 1
 yaw = 1
 User = None
+
+
 class MyoRaw(object):
     '''Implements the Myo-specific communication protocol.'''
 
@@ -296,8 +300,8 @@ class MyoRaw(object):
 
         ## add data handlers
         def handle_data(p):
-            
-            #Intialize variables to Global
+
+            # Intialize variables to Global
             global emg2
             global emg3
             global emg4
@@ -309,25 +313,25 @@ class MyoRaw(object):
             global pistalGrip
             global gyroscope
             global accelerometer
-            
+            global val2
+
             if (p.cls, p.cmd) != (4, 5): return
-    
+
             c, attr, typ = unpack('BHB', p.payload[:4])
             pay = p.payload[5:]
-            
-        
+
             if attr == 0x27:
                 vals = unpack('8HB', pay)
                 ## not entirely sure what the last byte is, but it's a bitmask that
                 ## seems to indicate which sensors think they're being moved around or
                 ## something
                 emg = vals[:8]
-                emg2 = vals[4]
-                emg3 = vals[4]
+                emg2 = vals[2]
+                emg3 = vals[5]
                 emg4 = vals[:8]
                 moving = vals[8]
                 self.on_emg(emg, moving)
-                                
+
             elif attr == 0x1c:
                 vals = unpack('10h', pay)
                 quat = vals[:4]
@@ -341,58 +345,64 @@ class MyoRaw(object):
                 gyro = vals[7:10]
                 gyroscope = vals[7:10]
                 self.on_imu(quat, acc, gyro)
-                MyoRaw.shotFired()
-            
-                      
-            elif attr == 0x23:
-                typ, val, xdir, _,_,_ = unpack('6B', pay)
+                # MyoRaw.shotFired()
 
-                if typ == 1: # on arm
+
+            elif attr == 0x23:
+                typ, val, xdir, _, _, _ = unpack('6B', pay)
+
+                if typ == 1:  # on arm
                     self.on_arm(Arm(val), XDirection(xdir))
-                elif typ == 2: # removed from arm
+                    val2 = val
+
+                elif typ == 2:  # removed from arm
                     self.on_arm(Arm.UNKNOWN, XDirection.UNKNOWN)
-                elif typ == 3: # pose
-                    #self.on_pose(Pose(val))
-                    if (val==1):
+                elif typ == 3:  # pose
+                    self.on_pose(Pose(val))
+                    if (val == 1):
                         '''
                         This attribute is when a user makes a fist,
                         essentially is being using when the user is
                         grabbing or holding an item.
                         '''
-                        
-                        #print('Pistal Grip')
-                        pistalGrip=True
+
+                        # print('Pistal Grip')
+                        pistalGrip = True
                     else:
-                        #print('Resting')
-                        pistalGrip=False
-                
+                        # print('Resting')
+                        pistalGrip = False
+
             else:
                 print('data with unknown attr: %02X %s' % (attr, p))
-                
+
         self.bt.add_handler(handle_data)
-        
-    #Determine the muscle movements for when a shot is fired
-    def emgShotFiredMeasurement():
-        #If emg sensor thresholds are reached then a shot was fired
-        #if(emg2>=650 or emg2<=-650 or emg3>=650 or emg3<=-650):
-        if(emg2>=200 or emg2<=-200 or emg3>=200 or emg3<=-200):
+
+    # Determine the muscle movements for when a shot is fired
+    def emgShotFiredMeasurementLeftArm():
+        # If emg sensor thresholds are reached then a shot was fired
+        if (emg2 >= 650 or emg2 <= -650):
             return True
         return False
 
-    #return EMG values of shooter    
+    def emgShotFiredMeasurementRightArm():
+        # If emg sensor thresholds are reached then a shot was fired
+        if (emg3 >= 600 or emg3 <= -600):
+            return True
+        return False
+
+    # return EMG values of shooter
     def shooterEmg():
-            return emg2
-           
-    #Determine if a shot is fired if shooter is holding a weapon
-    #and the emg values are within a current threshold than a shot
-    #was fired.
-    def shotFired():
+        return emg2
 
-        message='SHOT FIRED'
-        
-        if(MyoRaw.emgShotFiredMeasurement()==True
-               and accelerometer[2]>960 and gyroscope[2]<-1980):
+    # Determine if a shot is fired if shooter is holding a weapon
+    # and the emg values are within a current threshold than a shot
+    # was fired.
+    def shotFiredLeftArm():
 
+        message = 'SHOT FIRED'
+
+        if (MyoRaw.emgShotFiredMeasurementLeftArm() == True
+            and accelerometer[2] > 960 and gyroscope[2] < -1980):
             '''
                 print('************SHOT FIRED************')
                 print('gyroscope:      ', gyroscope)
@@ -405,34 +415,49 @@ class MyoRaw(object):
             return True
         return False
 
+    def shotFiredRightArm():
 
-        
-    #determine shooter position of the arm
-    #still work in progress
+        message = 'SHOT FIRED'
+
+        if (MyoRaw.emgShotFiredMeasurementRightArm() == True
+            and accelerometer[2] > 960 and gyroscope[2] < -1980):
+            '''
+                print('************SHOT FIRED************')
+                print('gyroscope:      ', gyroscope)
+                print('accelerometer:  ', accelerometer)
+                print('EMG sensor 4:   ', emg2)
+                print('EMG sensor 5:   ', emg3,'\n' )
+                #helloClient.connection(message)
+            '''
+
+            return True
+        return False
+
+    # determine shooter position of the arm
+    # still work in progress
     def shooterOrientation():
-        
-        aim = None
-        
-        #measure aim vertically
-        xDir = imu[1]                           #yaw
-        #measure aim horizontally
-        yDir = imu[2]                           #pitch
-        #measure how far arm is extended
-        zDir = imu[3]                           #roll
 
-        if(imu[1]>= -1300 and imu[2] >= -2000 and imu[3] <= 0):
+        aim = None
+
+        # measure aim vertically
+        xDir = imu[1]  # yaw
+        # measure aim horizontally
+        yDir = imu[2]  # pitch
+        # measure how far arm is extended
+        zDir = imu[3]  # roll
+
+        if (imu[1] >= -1300 and imu[2] >= -2000 and imu[3] <= 0):
             aim = 'arm RIGHT'
-        if(imu[1]<= -1300 and imu[2] <= -4000 and imu[3] >= 13000):
+        if (imu[1] <= -1300 and imu[2] <= -4000 and imu[3] >= 13000):
             aim = 'arm LEFT'
-        if(aim=='arm RIGHT'):
+        if (aim == 'arm RIGHT'):
             print(aim)
-        if(aim=='arm LEFT'):
+        if (aim == 'arm LEFT'):
             print(aim)
-            
-        
+
         return aim
-    
-    #Return orientation raw data
+
+    # Return orientation raw data
     def orientationData():
         return imu
 
@@ -455,7 +480,7 @@ class MyoRaw(object):
         '''
 
         self.write_attr(0x28, b'\x01\x00')
-        #self.write_attr(0x19, b'\x01\x03\x01\x01\x00')
+        # self.write_attr(0x19, b'\x01\x03\x01\x01\x00')
         self.write_attr(0x19, b'\x01\x03\x01\x01\x01')
 
     def mc_start_collection(self):
@@ -501,7 +526,6 @@ class MyoRaw(object):
             ## first byte tells it to vibrate; purpose of second byte is unknown
             self.write_attr(0x19, pack('3B', 3, 1, length))
 
-
     def add_emg_handler(self, h):
         self.emg_handlers.append(h)
 
@@ -513,7 +537,6 @@ class MyoRaw(object):
 
     def add_arm_handler(self, h):
         self.arm_handlers.append(h)
-
 
     def on_emg(self, emg, moving):
         for h in self.emg_handlers:
@@ -531,7 +554,7 @@ class MyoRaw(object):
     def on_arm(self, arm, xdir):
         for h in self.arm_handlers:
             h(arm, xdir)
-           
+
     def main(user):
         m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
 
@@ -539,32 +562,40 @@ class MyoRaw(object):
             ## print framerate of received data
             times.append(time.time())
             if len(times) > 20:
-                #print((len(times) - 1) / (times[-1] - times[0]))
+                # print((len(times) - 1) / (times[-1] - times[0]))
                 times.pop(0)
 
         m.add_emg_handler(proc_emg)
-        
+
         m.connect()
         pistalGrip = None
-        m.add_arm_handler(lambda arm, xdir: print('arm', arm, 'xdir', xdir,'\n'))
-        p=[]
-        m.add_pose_handler(lambda p: print(p))
-        print(p)
-        
-        if(pistalGrip == 'Pose.Rest'):
-            print('blah')
-        
+
+        m.add_arm_handler(lambda arm, xdir: print(arm))
+
+        # print(whichArm)
+        # m.add_pose_handler(lambda p: print(p))
+
+
+        if (pistalGrip == 'Pose.Rest'):
+            print('resting')
+
         try:
             while True:
+
                 m.run(1)
-                if (MyoRaw.shotFired()==True):
-                    user.setShot(True)
+                if (val2 == 1):
+                    if (MyoRaw.shotFiredRightArm() == True):
+                        user.setShot(True)
+
+                if (val2 == 2):
+                    if (MyoRaw.shotFiredLeftArm() == True):
+                        user.setShot(True)
 
                 user.setEMG(emg4)
                 user.setRoll(roll)
                 user.setPitch(pitch)
                 user.setYaw(yaw)
-               
+
         except KeyboardInterrupt:
             pass
         finally:
@@ -573,5 +604,4 @@ class MyoRaw(object):
 
 
 if __name__ == '__main__':
-       MyoRaw.main()
-    
+    MyoRaw.main()
