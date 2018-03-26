@@ -29,7 +29,9 @@ database_name = 'orcl'
 # Set-up the colors for use in GUI
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
-RED   = (200,   0,   0)
+GREY =(200, 200, 200)
+LIGHT_RED =(180, 0, 0)
+RED = (220,   0,   0)
 BRIGHT_RED   = (255,   0,   0)
 GREEN = (  0, 200,   0)
 BRIGHT_GREEN = (  0, 255,   0)
@@ -421,6 +423,7 @@ def DisplayArmOrient(display_Surface,newArm):
     display_Surface.blit(arm2, arm2pos)
     display_Surface.blit(arm3, arm3pos)
 
+# Averages a list of Coordinates
 def averageTracer(list):
     if(len(list) < 2):
         newList = [list[0]]
@@ -444,37 +447,54 @@ def averageTracer(list):
 
     return newList
 
-
 # Draws the tracer window and its components to the window
 def DisplayTracer(display_Surface,tracer,heading,targetVisible, targetLocation, targetSymbol,locSymbol):
     # Fills the section of the window with a white background
     display_Surface.fill(WHITE,[20,banner_height+20,tracer_width,tracer_heigth])
     # Assigns list to the list stored in the tracer object
     list = tracer.get_tracer()
-
-    #list = averageTracer(list)
+    # Calls to average the location of the user
+    list = averageTracer(list)
     # Initializes 'pastElement' to None
     pastElement = None
+    # Iterator counts the loop
+    iterator = 0
     # Loops through each element in the tracer list
     for element in list:
         # If it is the first element
         if(pastElement == None):
                 # Assign the previous element to the current element
                 pastElement = element
+                # increment iterator
+                iterator += 1
         # This is not the first element
         else:
-            # Draw a line between the previous point and the current point
-            pygame.draw.line(display_Surface, RED, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+                # Draws the line of the tracer in 4 different colors depending on where it exists in order
+            if(iterator > len(list) - 4):
+                # Draw a line between the previous point and the current point
+                pygame.draw.line(display_Surface, BRIGHT_RED, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+            elif(iterator > len(list) - 7):
+                # Draw a line between the previous point and the current point
+                pygame.draw.line(display_Surface, RED, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+            elif(iterator > len(list) - 10):
+                # Draw a line between the previous point and the current point
+                pygame.draw.line(display_Surface, LIGHT_RED, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+            else:
+                # Draw a line between the previous point and the current point
+                pygame.draw.line(display_Surface, GREY, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+
             # Assign the previous element to the current element
             pastElement = element
+            # increment iterator
+            iterator += 1
 
     # Checks if there is a heading
     # If there is a heading it is a user we can place the symbol for
-    if(heading != None):
+    if(heading != None and pastElement != None):
         # Orient the symbol to the proper heading
         locSymbol = orientation(locSymbol, float(heading))
         # Place the symbol for the user
-        placeSymbol(display_Surface, locSymbol, element.getX()-30, element.getY()-30)
+        placeSymbol(display_Surface, locSymbol, pastElement.getX()-30, pastElement.getY()-30)
 
     # Checks if the target is visible
     if(targetVisible == 1):
