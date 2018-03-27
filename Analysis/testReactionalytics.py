@@ -144,3 +144,5 @@ if __name__ == '__main__':
     print("Total Number of actors in event = ", testEvent3.getTotalNumberOfActors())
     print("Total Number of Targets = ", testEvent3.getTotalNumberOfTargets())
     print("Total Number of Shooters = ", testEvent3.getTotalNumberOfShooters())
+    print(testEvent3.getAvgReactionTimeBeforeRowByUser(191,1))
+

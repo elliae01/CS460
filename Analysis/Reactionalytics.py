@@ -2,6 +2,7 @@ from pandas import DataFrame
 import cx_Oracle
 import os
 import math
+import numpy as np
 from Server.UserInformation import *
 
 print("Hello, Welcome to Reactionalytics.py")
@@ -415,9 +416,38 @@ class Reactionalytics:
 
     def getReactionTimeBeforeRowByUser(self, row, user):
         count=self.rowcount()
+        dfCurrentEvent = (self.df['Id'] == user)
+        df=self.df[dfCurrentEvent]
+        x=df.iat[0, self.cCol4LocX]
+        y=df.iat[0, self.cCol4LocY]
 
         return -1
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):
+        a = np.zeros((100, 100, 4))
+        b[1]=111
+        b[2]=222
+        b[3]=333
+        print(a[1,1,1])
+        print(a[1,1,2])
+        print(a[1,2,1])
+        print(a[2,2,2])
+        print(b)
         return -1
+        count=self.rowcount()
+        d=-1.0     # -1 reports a failure
+        if row<=count:
+            d = 0
+            for i in range(row):
+                if self.getID(i)==user:
+                    #print(self.getINDEX(i),self.getX(i),self.getY(i))
+                    x1 = self.getX(i-1)
+                    y1 = self.getY(i-1)
+                    x2 = self.getX(i)
+                    y2 = self.getY(i)
+                    d2 = self.distance2D(x1,x2,y1,y2)
+                    d = d + self.distanceFromLastPoint(i)
+        if d<0:
+            print("Error ", d, " in getAvgReactionTimeBeforeRowByUser: Row = ", row, " Count = ", count)
+        return d
 
