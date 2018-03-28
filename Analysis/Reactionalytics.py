@@ -179,14 +179,14 @@ class Reactionalytics:
         return self.df.iat[row, self.cCol4HeartRate]
 
     def getEmgArray(self, row):
-        a=[self.df.iat[row,self.cCol4Emg0],
+        a=(self.df.iat[row,self.cCol4Emg0],
             self.df.iat[row,self.cCol4Emg1],
             self.df.iat[row,self.cCol4Emg2],
             self.df.iat[row,self.cCol4Emg3],
             self.df.iat[row,self.cCol4Emg4],
             self.df.iat[row,self.cCol4Emg5],
             self.df.iat[row,self.cCol4Emg6],
-            self.df.iat[row,self.cCol4Emg7]]
+            self.df.iat[row,self.cCol4Emg7])
         return a
 
     def getEmg0(self, row):
@@ -212,6 +212,12 @@ class Reactionalytics:
 
     def getEmg7(self, row):
         return self.df.iat[row, self.cCol4Emg7]
+
+    def getArmArray(self, row):
+        a=(self.df.iat[row,self.cCol4ArmRoll],
+            self.df.iat[row,self.cCol4ArmPitch],
+            self.df.iat[row,self.cCol4ArmHeading])
+        return a
 
     def getArmRoll(self, row):
         return self.df.iat[row, self.cCol4ArmRoll]

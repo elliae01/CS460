@@ -263,17 +263,28 @@ def guiMain(display_Surface,cursor,clock,T):
             current = data_array[iterator]
             # Converts the location X and Y at the current record to the scaled location
             # of X and Y that fit the tracer window
-            x,y = tracer.convert_point_To_fit(current[3],current[4])
-
+            x,y = tracer.convert_point_To_fit(T.getX(iterator),T.getY(iterator))
+            if current[3]!=T.getX(iterator):
+                print("Error with x = ",x)
+            if current[4] != T.getY(iterator):
+                print("Error with y = ", y)
 
                 # # # Target Handling Section # # #
             # Checks if the ID of the record is greater than 100 which indicates a target
-            if(current[2] > 100):
+            if T.getID(iterator) != current[2]:
+                print("Error with ID",current[2])
+            if(T.getID(iterator) > 100):
 
                 # Checks if the target reports that it became visible
-                if(current[7] == 1):
+                if T.getTargetVisible(iterator) != current[7]:
+                    print("Error with Visible = ", current[7])
+                if T.getHit(iterator) == current[6]:
+                    print("Error with Hit = ", current[6])
+                if(T.getTargetVisible(iterator) == 1):
                     # Sets the 'visibleMarker' variable to the time stamp of the record
-                    visibleMarker = current[1]
+                    visibleMarker = T.getDate(iterator)
+                    if current[1] != T.getDate(iterator):
+                        print("Error with Date = ",visibleMarker)
                     # Sets the 'targetVisible' variable to True
                     targetVisible = 1
                     # Sets the target Location to the Coordinate object storing the X and Y location to draw the target
@@ -284,7 +295,7 @@ def guiMain(display_Surface,cursor,clock,T):
                     # Sets the 'targetVisible' variable to False
                     targetVisible = 0
                     # sets 'reaction' to the current reaction speed of the shooter to hit the target
-                    reaction = current[1] - visibleMarker
+                    reaction = T.getDate(iterator) - visibleMarker
                     # Adds the new reaction to the list of reactions
                     reactionList.append(to_float(reaction))
                     # Sets the 'reactionSum' variable to 0 to clear it.
@@ -304,7 +315,9 @@ def guiMain(display_Surface,cursor,clock,T):
                 # Adds the new point to the tracer array within the tracer object
                 tracer.add_tracer(newPoint)
                 # Checks if the user fired a shot
-                if(current[5] == 1):
+                if T.getShot(iterator) != current[5]:
+                    print("Error with shot", current[5], " vs ",T.getShot(iterator))
+                if(T.getShot(iterator) == 1):
                     # Adds one to the 'shotCount' variable
                     shotCount = shotCount + 1
 
@@ -312,7 +325,9 @@ def guiMain(display_Surface,cursor,clock,T):
                     checkHitMissIterator = iterator-1
                     while checkHitMissIterator < iterator + 3:
                         nextRecords = data_array[checkHitMissIterator]
-                        if(nextRecords[6] == 1):
+                        if T.getHit(checkHitMissIterator) != nextRecords[6]:
+                            print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
+                        if(T.getHit(checkHitMissIterator) == 1):
                             hitCount += 1
                             break
                         elif (checkHitMissIterator == iterator + 2):
@@ -321,8 +336,13 @@ def guiMain(display_Surface,cursor,clock,T):
 
                 # Sets the emg values
                 emg = current[9:17]
+                if T.getEmgArray(iterator) != emg:
+                    print("emg Error",emg, 'T=', T.getEmgArray(iterator))
                 # Sets the arm orientation values
                 arm_orient = current[18:20]
+                arm_orientNew= T.getArmArray(iterator)
+                if arm_orientNew == arm_orient:
+                    print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
 
             # Sets the hit miss ratio
             if(hitCount > 0):
@@ -333,7 +353,7 @@ def guiMain(display_Surface,cursor,clock,T):
             # Call to display the EMG Values ( surface to draw on, emg list)
             DisplayEMG(display_Surface,emg)
             # Call to display the Arm Orientation Values ( surface to draw on, arm orientation list)
-            DisplayArmOrient(display_Surface, arm_orient)
+            DisplayArmOrient(display_Surface, arm_orientNew)
             # Call to display the tracer window ( surface to draw on, tracer object, heading, target visible variable,
             # target location Coordinate, target Symbol, location symbol)
             DisplayTracer(display_Surface,tracer,current[8],targetVisible, targetLocation, targetSymbol,locSymbol)
@@ -431,10 +451,10 @@ def DisplayArmOrient(display_Surface,newArm):
     arm1 = font.render('Arm Roll - ' + str(newArm[0]), 1, arm_color)
     arm1pos = arm1.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow))
 
-    arm2 = font.render('Arm Pitch - ' + str(newArm[0]), 1, arm_color)
+    arm2 = font.render('Arm Pitch - ' + str(newArm[1]), 1, arm_color)
     arm2pos = arm2.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow + verticle_spacing))
 
-    arm3 = font.render('Arm Yaw - ' + str(newArm[0]), 1, arm_color)
+    arm3 = font.render('Arm Yaw - ' + str(newArm[2]), 1, arm_color)
     arm3pos = arm3.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow + verticle_spacing*2))
 
     # Draws the orientation text to the window
