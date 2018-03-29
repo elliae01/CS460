@@ -718,7 +718,7 @@ if __name__ == '__main__':
     StartDate = pd.to_datetime('2018-03-17 16:07:56.164')
     EndDate = pd.to_datetime('2018-03-17 16:59:12.000')
     T = Targalytics(DatabaseInfo, StartDate, EndDate)
-    T.ExportToCSV('Kyle')
+    T.ExportToCSV('Kyles Demo')
 
     display_surface,clock = GuiSetup()
     # Connects to the database using parameters in 'Control Panel' at top
