@@ -1,6 +1,6 @@
 from multiprocessing import Process, Manager
 from multiprocessing.managers import *
-from Reactionalytics import *
+from Targalytics import *
 from datetime import datetime
 import pandas as pd
 
@@ -29,14 +29,14 @@ if __name__ == '__main__':
 
     # Create Event 1
     print("testEvent1...Created using Dates ",StartDate," through ",EndDate,"  --> Elasped Time=",(EndDate-StartDate))
-    testEvent1=Reactionalytics(DatabaseInfo, StartDate, EndDate)
+    testEvent1=Targalytics(DatabaseInfo, StartDate, EndDate)
     testEvent1.ExportToCSV("Test DB Before Sort")
     testEvent1.sortByDate()
     testEvent1.ExportToCSV("Test DB After Sort")
     FirstTimeStamp=testEvent1.getDate(0)
-    LastTimeStamp=testEvent1.getDate(testEvent1.rowcount()-1)
+    LastTimeStamp=testEvent1.getDate(testEvent1.rowCount()-1)
     TotalDistanceUser1=testEvent1.TotalDistanceTraveled(1)
-    TotalCount=testEvent1.rowcount()
+    TotalCount=testEvent1.rowCount()
     print("First Event in Database occurred on ",FirstTimeStamp, "(Expected: 2018-02-06 19:57:26.376000 )")
     print("Last Event in Database occurred on ",LastTimeStamp,"(Expected: 2018-03-17 16:08:34.975000 )")
     print("Elapsed time = ",(LastTimeStamp-FirstTimeStamp), "(Expected: 38 days 20:11:08.599000 )")
@@ -81,14 +81,14 @@ if __name__ == '__main__':
     # Create Event 2
     print("------------------------------------------------------------")
     print("testEvent2...Created using Dates ",StartDate," through ",EndDate,"  --> Elasped Time=",(EndDate-StartDate))
-    testEvent2=Reactionalytics(DatabaseInfo, StartDate, EndDate)
+    testEvent2=Targalytics(DatabaseInfo, StartDate, EndDate)
     testEvent2.ExportToCSV("Test2 DB Before Sort")
     testEvent2.sortByDate()
     testEvent2.ExportToCSV("Test2 DB After Sort")
     FirstTimeStamp=testEvent2.getDate(0)
-    LastTimeStamp=testEvent2.getDate(testEvent2.rowcount()-1)
+    LastTimeStamp=testEvent2.getDate(testEvent2.rowCount()-1)
     TotalDistanceUser1=testEvent2.TotalDistanceTraveled(1)
-    TotalCount=testEvent2.rowcount()
+    TotalCount=testEvent2.rowCount()
     print("First Event in Database occurred on ",FirstTimeStamp, "(Expected: 2018-02-09 15:53:36.070000 )")
     print("Last Event in Database occurred on ",LastTimeStamp,"(Expected: 2018-02-09 15:59:11.789000 )")
     print("Elapsed time = ",(LastTimeStamp-FirstTimeStamp), "(Expected: 0 days 00:05:35.719000 )")
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     # Create Event 3
     print("------------------------------------------------------------")
     print("testEvent3...Created using Dates ",StartDate," through ",EndDate,"  --> Elasped Time=",(EndDate-StartDate))
-    testEvent3=Reactionalytics(DatabaseInfo, StartDate, EndDate)
+    testEvent3=Targalytics(DatabaseInfo, StartDate, EndDate)
     print("Total Number of actors in event = ", testEvent3.getTotalNumberOfActors())
     print("Total Number of Targets = ", testEvent3.getTotalNumberOfTargets())
     print("Total Number of Shooters = ", testEvent3.getTotalNumberOfShooters())

@@ -2,7 +2,7 @@ from multiprocessing import Process, Manager
 from multiprocessing.managers import *
 from datetime import datetime
 import pandas as pd
-from Reactionalytics import *
+from Targalytics import *
 
 def __init_():
     print("hello from Analysis init")
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     #All of Database
     StartDate = pd.to_datetime(0)
     EndDate = datetime.now()
-    r=Reactionalytics(DatabaseInfo, StartDate, EndDate)
+    r=Targalytics(DatabaseInfo, StartDate, EndDate)
 
     r.sortByDate()
     r.ExportToCSV("DataAfterSortDate")
@@ -35,8 +35,8 @@ if __name__ == '__main__':
     # r2=r.getSubSet(StartDate, EndDate)
     r2=r
     r.printHeadDF()
-    print("After subset- r2=",r2.rowcount())
-    print("After subset - r=",r.rowcount())
+    print("After subset- r2=",r2.rowCount())
+    print("After subset - r=",r.rowCount())
     print("Emg=",r.getEmgArray(0))
     # df2=r.getRawDF()
     # print(df2)
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     print(r.DistanceTraveled(1,FirstTimeStamp,datetime.now()))
     print("Total Shot count = ",r.getTotalShotCountForUser(1))
     print("Shot count in the sub set = ",r2.getTotalShotCountForUser(1))
-    r3=Reactionalytics(DatabaseInfo, StartDate, EndDate)
+    r3=Targalytics(DatabaseInfo, StartDate, EndDate)
     #r3.printDF()
     d=r3.DistanceTraveled(1,StartDate,EndDate)
     print("Total Distance r3 = ", d)

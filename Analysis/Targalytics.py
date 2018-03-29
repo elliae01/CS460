@@ -5,9 +5,9 @@ import math
 import numpy as np
 from Server.UserInformation import *
 
-print("Hello, Welcome to Reactionalytics.py")
+print("Hello, Welcome to Targalytics.py")
 
-class Reactionalytics:
+class Targalytics:
     df = None
     dfReaction = None
 
@@ -280,7 +280,7 @@ class Reactionalytics:
 
     def DistanceTraveled(self,user,startdate,finishdate):
         NotFirst=False
-        count=self.rowcount()
+        count=self.rowCount()
         diff=finishdate-startdate
         #print("Count = ",count)
         #print("StartDate=", startdate, " --  Finish Date=", finishdate, " --> Elasped Time=",diff)
@@ -304,7 +304,7 @@ class Reactionalytics:
         return d
 
     def getTotalShotCountForUser(self,user):
-        count=self.rowcount()
+        count=self.rowCount()
         d=0.0
         for i in range(count-1):
             if self.getID(i)==user:
@@ -313,7 +313,7 @@ class Reactionalytics:
         return d
 
     def getShotsBeforeRowByUser(self, row, user):
-        count=self.rowcount()
+        count=self.rowCount()
         d=-1.0     # -1 reports a failure
         if row<=count:
             d = 0
@@ -326,7 +326,7 @@ class Reactionalytics:
         return d
 
     def getHitsBeforeRowByUser(self, row, user):
-        count=self.rowcount()
+        count=self.rowCount()
         d=-1.0     # -1 reports a failure
         if row<=count:
             d = 0
@@ -339,7 +339,7 @@ class Reactionalytics:
         return d
 
     def getHitMissRatioBeforeRowByUser(self, row, user):
-        count=self.rowcount()
+        count=self.rowCount()
         if row > count:
             print("Error ", -1 , " in getHitMissRatioBeforeRowByUser: Row = ", row, " Count = ", count)
             return -1
@@ -349,7 +349,7 @@ class Reactionalytics:
 
     def getDistanceBeforeRowByUser(self, row, user):
         NotFirst=False
-        count=self.rowcount()
+        count=self.rowCount()
         d=-1.0     # -1 reports a failure
         if row<=count:
             d = 0
@@ -421,7 +421,7 @@ class Reactionalytics:
         return x,y
 
     def getReactionTimeBeforeRowByUser(self, row, user):
-        count=self.rowcount()
+        count=self.rowCount()
         dfCurrentEvent = (self.df['Id'] == user)
         df=self.df[dfCurrentEvent]
         x=df.iat[0, self.cCol4LocX]
@@ -431,16 +431,12 @@ class Reactionalytics:
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):
         a = np.zeros((100, 100, 4))
-        b[1]=111
-        b[2]=222
-        b[3]=333
         print(a[1,1,1])
         print(a[1,1,2])
         print(a[1,2,1])
         print(a[2,2,2])
-        print(b)
         return -1
-        count=self.rowcount()
+        count=self.rowCount()
         d=-1.0     # -1 reports a failure
         if row<=count:
             d = 0
