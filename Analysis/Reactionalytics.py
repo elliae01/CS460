@@ -249,10 +249,10 @@ class Reactionalytics:
     def getHeadPitch(self, row):
         return self.df.iat[row, self.cCol4HeadPitch]
 
-    def rowcount(self):
+    def rowCount(self):
         return self.df['INDEX'].count()
 
-    def columncount(self):
+    def columnCount(self):
         return self.df.shape[1]
 
     def distanceFromLastPoint(self,row):

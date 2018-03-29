@@ -159,31 +159,31 @@ def GuiSetup():
     return display_Surface,clock
 
 # Main Gui Method
-def guiMain(display_Surface,cursor,clock,T):
+def guiMain(display_Surface,clock,T):
             # # # Database Section # # #
     # Executes the main SQL query and assigns the list to 'data_array'
-    cursor.execute('(SELECT s.S_INDEX,s.S_DATE AS time,s.S_SHOOTER.Id AS id,s.S_SHOOTER.Loc.x AS x,s.S_SHOOTER.Loc.y AS y,s.S_SHOOTER.shot AS shot, NULL AS hit, NULL AS visible, s.S_SHOOTER.head.heading AS heading,s.S_SHOOTER.arm.emg.emg0 AS emg0,s.S_SHOOTER.arm.emg.emg1 AS emg1,s.S_SHOOTER.arm.emg.emg2 AS emg2,s.S_SHOOTER.arm.emg.emg3 AS emg3,s.S_SHOOTER.arm.emg.emg4 AS emg4,s.S_SHOOTER.arm.emg.emg5 AS emg5,s.S_SHOOTER.arm.emg.emg6 AS emg6,s.S_SHOOTER.arm.emg.emg7 AS emg7,s.S_SHOOTER.arm.roll AS ARM_ROLL,s.S_SHOOTER.arm.pitch AS ARM_PITCH,s.S_SHOOTER.arm.heading AS ARM_YAW  FROM Shooter_Table s WHERE s.S_INDEX>15525) UNION ALL (SELECT t.T_INDEX,t.T_DATE AS time,t.T_TARGET.ID AS id,t.T_TARGET.Loc.x AS x, t.T_TARGET.Loc.y AS y,NULL AS shot, t.T_TARGET.hit AS hit, t.T_TARGET.visible AS visible, NULL AS heading, NULL AS emg0,NULL AS emg1,NULL AS emg2,NULL AS emg3,NULL AS emg4,NULL AS emg5,NULL AS emg6,NULL AS emg7, NULL AS ARM_ROLL, NULL AS ARM_PITCH, NULL AS ARM_YAW FROM Target_Table t WHERE  t.T_INDEX>1080) ORDER BY time')
-    data_array = cursor.fetchall()
+    # cursor.execute('(SELECT s.S_INDEX,s.S_DATE AS time,s.S_SHOOTER.Id AS id,s.S_SHOOTER.Loc.x AS x,s.S_SHOOTER.Loc.y AS y,s.S_SHOOTER.shot AS shot, NULL AS hit, NULL AS visible, s.S_SHOOTER.head.heading AS heading,s.S_SHOOTER.arm.emg.emg0 AS emg0,s.S_SHOOTER.arm.emg.emg1 AS emg1,s.S_SHOOTER.arm.emg.emg2 AS emg2,s.S_SHOOTER.arm.emg.emg3 AS emg3,s.S_SHOOTER.arm.emg.emg4 AS emg4,s.S_SHOOTER.arm.emg.emg5 AS emg5,s.S_SHOOTER.arm.emg.emg6 AS emg6,s.S_SHOOTER.arm.emg.emg7 AS emg7,s.S_SHOOTER.arm.roll AS ARM_ROLL,s.S_SHOOTER.arm.pitch AS ARM_PITCH,s.S_SHOOTER.arm.heading AS ARM_YAW  FROM Shooter_Table s WHERE s.S_INDEX>15525) UNION ALL (SELECT t.T_INDEX,t.T_DATE AS time,t.T_TARGET.ID AS id,t.T_TARGET.Loc.x AS x, t.T_TARGET.Loc.y AS y,NULL AS shot, t.T_TARGET.hit AS hit, t.T_TARGET.visible AS visible, NULL AS heading, NULL AS emg0,NULL AS emg1,NULL AS emg2,NULL AS emg3,NULL AS emg4,NULL AS emg5,NULL AS emg6,NULL AS emg7, NULL AS ARM_ROLL, NULL AS ARM_PITCH, NULL AS ARM_YAW FROM Target_Table t WHERE  t.T_INDEX>1080) ORDER BY time')
+    # data_array = cursor.fetchall()
     # Executes an SQL query to find the minimum and maximum values for both X and Y coordinates of the target and user
     # Then assigns it to 'calibration_array'
-    cursor.execute('SELECT max(s.S_SHOOTER.Loc.x), max(t.T_TARGET.Loc.x), min(s.S_SHOOTER.Loc.x),min(t.T_TARGET.Loc.x),max(s.S_SHOOTER.Loc.y), max(t.T_TARGET.Loc.y), min(s.S_SHOOTER.Loc.y),min(t.T_TARGET.Loc.y) FROM Shooter_Table s, Target_Table t WHERE  t.T_INDEX>1080 AND s.S_INDEX>15525')
-    calibration_array = cursor.fetchall()
+    # cursor.execute('SELECT max(s.S_SHOOTER.Loc.x), max(t.T_TARGET.Loc.x), min(s.S_SHOOTER.Loc.x),min(t.T_TARGET.Loc.x),max(s.S_SHOOTER.Loc.y), max(t.T_TARGET.Loc.y), min(s.S_SHOOTER.Loc.y),min(t.T_TARGET.Loc.y) FROM Shooter_Table s, Target_Table t WHERE  t.T_INDEX>1080 AND s.S_INDEX>15525')
+    # calibration_array = cursor.fetchall()
 
     # Finds the maximum and minimum values for X and Y taking into consideration the target and the user
     # Then assigns them
-    max_x = max(calibration_array[0][0], calibration_array[0][1])
-    if max_x!=T.getMaxX():
-        print("MaxX error")
-    min_x = min(calibration_array[0][2], calibration_array[0][3])
-    if min_x!=T.getMinX():
-        print("MinX error: min_x = ",min_x, " and getMinX=", T.getMinX())
-    max_y = max(calibration_array[0][4], calibration_array[0][5])
-    if max_y!=T.getMaxY():
-        print("MaxY error")
-    min_y = min(calibration_array[0][6], calibration_array[0][7])
-    if min_y != T.getMinY():
-        print("MinY error: min_y = ",min_y, " and getMinY=", T.getMinY())
-
+    # max_x = max(calibration_array[0][0], calibration_array[0][1])
+    # if max_x!=T.getMaxX():
+    #     print("MaxX error")
+    # min_x = min(calibration_array[0][2], calibration_array[0][3])
+    # if min_x!=T.getMinX():
+    #     print("MinX error: min_x = ",min_x, " and getMinX=", T.getMinX())
+    # max_y = max(calibration_array[0][4], calibration_array[0][5])
+    # if max_y!=T.getMaxY():
+    #     print("MaxY error")
+    # min_y = min(calibration_array[0][6], calibration_array[0][7])
+    # if min_y != T.getMinY():
+    #     print("MinY error: min_y = ",min_y, " and getMinY=", T.getMinY())
+    #
     max_x = T.getMaxX()
     min_x = T.getMinX()
     max_y = T.getMaxY()
@@ -235,9 +235,10 @@ def guiMain(display_Surface,cursor,clock,T):
 
     while running:
         try:
-            if(iterator + 1 == len(data_array)):
+            # if(iterator + 1 == len(data_array)):
+            if (iterator + 1 == T.rowCount()):
                 running = False
-                endHandler(display_Surface,clock,cursor)
+                endHandler(display_Surface,clock)
                     # # # Handles events in this section # # #
 
             for event in pygame.event.get():
@@ -260,38 +261,38 @@ def guiMain(display_Surface,cursor,clock,T):
             DrawBorders(display_Surface)
 
             # assigns 'current' with the record that takes place at the 'iterator'
-            current = data_array[iterator]
+            # current = data_array[iterator]
             # Converts the location X and Y at the current record to the scaled location
             # of X and Y that fit the tracer window
             x,y = tracer.convert_point_To_fit(T.getX(iterator),T.getY(iterator))
-            if current[3]!=T.getX(iterator):
-                print("Error with x = ",x)
-            if current[4] != T.getY(iterator):
-                print("Error with y = ", y)
+            # if current[3]!=T.getX(iterator):
+            #     print("Error with x = ",x)
+            # if current[4] != T.getY(iterator):
+            #     print("Error with y = ", y)
 
                 # # # Target Handling Section # # #
             # Checks if the ID of the record is greater than 100 which indicates a target
-            if T.getID(iterator) != current[2]:
-                print("Error with ID",current[2])
+            # if T.getID(iterator) != current[2]:
+            #     print("Error with ID",current[2])
             if(T.getID(iterator) > 100):
 
                 # Checks if the target reports that it became visible
-                if T.getTargetVisible(iterator) != current[7]:
-                    print("Error with Visible = ", current[7])
-                if T.getHit(iterator) == current[6]:
-                    print("Error with Hit = ", current[6])
+                # if T.getTargetVisible(iterator) != current[7]:
+                #     print("Error with Visible = ", current[7])
+                # if T.getHit(iterator) != current[6]:
+                #     print("Error with Hit = ", current[6])
                 if(T.getTargetVisible(iterator) == 1):
                     # Sets the 'visibleMarker' variable to the time stamp of the record
                     visibleMarker = T.getDate(iterator)
-                    if current[1] != T.getDate(iterator):
-                        print("Error with Date = ",visibleMarker)
+                    # if current[1] != T.getDate(iterator):
+                    #     print("Error with Date = ",visibleMarker)
                     # Sets the 'targetVisible' variable to True
                     targetVisible = 1
                     # Sets the target Location to the Coordinate object storing the X and Y location to draw the target
                     targetLocation = Coordinate(x, y)
 
                 # Checks if the targets reports that it was hit
-                elif(current[6] == 1):
+                elif(T.getHit(iterator) == 1):
                     # Sets the 'targetVisible' variable to False
                     targetVisible = 0
                     # sets 'reaction' to the current reaction speed of the shooter to hit the target
@@ -315,8 +316,8 @@ def guiMain(display_Surface,cursor,clock,T):
                 # Adds the new point to the tracer array within the tracer object
                 tracer.add_tracer(newPoint)
                 # Checks if the user fired a shot
-                if T.getShot(iterator) != current[5]:
-                    print("Error with shot", current[5], " vs ",T.getShot(iterator))
+                # if T.getShot(iterator) != current[5]:
+                #     print("Error with shot", current[5], " vs ",T.getShot(iterator))
                 if(T.getShot(iterator) == 1):
                     # Adds one to the 'shotCount' variable
                     shotCount = shotCount + 1
@@ -324,9 +325,10 @@ def guiMain(display_Surface,cursor,clock,T):
                     #This section checks the next few records to find if the user hit or missed the target
                     checkHitMissIterator = iterator-1
                     while checkHitMissIterator < iterator + 3:
-                        nextRecords = data_array[checkHitMissIterator]
-                        if T.getHit(checkHitMissIterator) != nextRecords[6]:
-                            print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
+                        # nextRecords = data_array[checkHitMissIterator]
+                        nextRecords = T.getHit(checkHitMissIterator)
+                        # if (T.getHit(checkHitMissIterator) != 0 and nextRecords[6]==None):
+                        #     print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
                         if(T.getHit(checkHitMissIterator) == 1):
                             hitCount += 1
                             break
@@ -335,14 +337,15 @@ def guiMain(display_Surface,cursor,clock,T):
                         checkHitMissIterator +=1
 
                 # Sets the emg values
-                emg = current[9:17]
-                if T.getEmgArray(iterator) != emg:
-                    print("emg Error",emg, 'T=', T.getEmgArray(iterator))
+                # emg = current[9:17]
+                # if T.getEmgArray(iterator) != emg:
+                #     print("emg Error",emg, 'T=', T.getEmgArray(iterator))
+                emg = T.getEmgArray(iterator)
                 # Sets the arm orientation values
-                arm_orient = current[18:20]
+                # arm_orient = current[17:20]   #was 18:20 but that fails the test below by bringing in only the first 2 elements of Arm
                 arm_orientNew= T.getArmArray(iterator)
-                if arm_orientNew == arm_orient:
-                    print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
+                # if arm_orientNew != arm_orient:
+                #      print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
 
             # Sets the hit miss ratio
             if(hitCount > 0):
@@ -356,7 +359,7 @@ def guiMain(display_Surface,cursor,clock,T):
             DisplayArmOrient(display_Surface, arm_orientNew)
             # Call to display the tracer window ( surface to draw on, tracer object, heading, target visible variable,
             # target location Coordinate, target Symbol, location symbol)
-            DisplayTracer(display_Surface,tracer,current[8],targetVisible, targetLocation, targetSymbol,locSymbol)
+            DisplayTracer(display_Surface,tracer,T.getHeadHeading(iterator),targetVisible, targetLocation, targetSymbol,locSymbol)
             # Call to display the stats of the user ( surface to draw on, shot count, hit count, average reaction speed,
             # distance traveled, score)
             DisplayStats(display_Surface, shotCount, hitCount, missCount, avgReact, distance, score)
@@ -598,7 +601,7 @@ def orientation(originalSymbol,heading):
     return facing
 
 # Is called when the end of analysis is detected
-def endHandler(display_Surface, clock, cursor):
+def endHandler(display_Surface, clock):
     end_color = BLACK
     font_size = 30
     start_of_window_width = display_width/4
@@ -661,7 +664,7 @@ def endHandler(display_Surface, clock, cursor):
                 display_Surface.blit(analyze, analyzepos)
                 pygame.display.update()
                 if(click[0] == 1):
-                    guiMain(display_surface, cursor, clock, T)
+                    guiMain(display_surface, clock, T)
             else:
                 display_Surface.fill(BLACK, [start_of_window_width + space_to_first_button,
                                              start_of_window_height + drop_to_button, button_width, button_height])
@@ -719,5 +722,6 @@ if __name__ == '__main__':
 
     display_surface,clock = GuiSetup()
     # Connects to the database using parameters in 'Control Panel' at top
-    database, cursor = dbConnect(user, password, host, database_name)
-    guiMain(display_surface,cursor, clock,T)
+    # database, cursor = dbConnect(user, password, host, database_name)
+    # guiMain(display_surface,cursor, clock,T)
+    guiMain(display_surface, clock, T)
