@@ -1,3 +1,4 @@
+select * from TARGET_TABLE
 
 -- Fromo Kyle's 1nd query in GUI
 (SELECT

@@ -15,14 +15,7 @@ Find SQL insert statements in the "TestDB" folder.
 --3/19/2018
 """
 
-if __name__ == '__main__':
-    ip = 'localhost'
-    port = 1521
-    SID = 'orcl'
-    UserName="SYSMAN"
-    PassWord="System_Admin1"
-    DatabaseInfo=[ip,port,SID,UserName,PassWord]
-
+def Test1():
     #All in Database
     StartDate = pd.to_datetime(0)
     EndDate = datetime.now()
@@ -71,6 +64,7 @@ if __name__ == '__main__':
     print("Total Number of Targets = ", testEvent1.getTotalNumberOfTargets())
     print("Total Number of Shooters = ", testEvent1.getTotalNumberOfShooters())
 
+def Test2():
     # Test 2 - showing 2 lines in Database
     StartDate = pd.to_datetime('2018-02-09 15:53:36.070')
     EndDate = pd.to_datetime('2018-02-09 15:59:11.789')
@@ -79,7 +73,7 @@ if __name__ == '__main__':
     # StartDate = pd.to_datetime('2018-02-09 15:52:56.963')
 
     # Create Event 2
-    print("------------------------------------------------------------")
+    print("-------------------Testing for 2 rows in dataframe-------------------------")
     print("testEvent2...Created using Dates ",StartDate," through ",EndDate,"  --> Elasped Time=",(EndDate-StartDate))
     testEvent2=Targalytics(DatabaseInfo, StartDate, EndDate)
     testEvent2.ExportToCSV("Test2 DB Before Sort")
@@ -133,16 +127,38 @@ if __name__ == '__main__':
     print("Total Number of Targets = ", testEvent2.getTotalNumberOfTargets())
     print("Total Number of Shooters = ", testEvent2.getTotalNumberOfShooters())
 
-    # Test 3 - showing 2 lines in Database
-    StartDate = pd.to_datetime('2018-03-17 16:07:00.000')
-    EndDate = pd.to_datetime('2018-03-17 16:59:12.000')
+def Test3():
 
     # Create Event 3
-    print("------------------------------------------------------------")
+    print("-------------------Kyle's Demo-----------------------------------")
     print("testEvent3...Created using Dates ",StartDate," through ",EndDate,"  --> Elasped Time=",(EndDate-StartDate))
     testEvent3=Targalytics(DatabaseInfo, StartDate, EndDate)
     print("Total Number of actors in event = ", testEvent3.getTotalNumberOfActors())
     print("Total Number of Targets = ", testEvent3.getTotalNumberOfTargets())
     print("Total Number of Shooters = ", testEvent3.getTotalNumberOfShooters())
     print(testEvent3.getAvgReactionTimeBeforeRowByUser(191,1))
+    print("Number of Target Events (Visibile=true)",testEvent3.totalTargetVisibleCount())
+    aEvents=testEvent3.TargetVisibleEventTimes()
+    print(aEvents)
+    print("Max X",testEvent3.getMaxX())
+    print("Min X",testEvent3.getMinX())
+    print("Max Y",testEvent3.getMaxY())
+    print("Min Y",testEvent3.getMinY())
+    print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
 
+
+if __name__ == '__main__':
+    ip = 'localhost'
+    port = 1521
+    SID = 'orcl'
+    UserName="SYSMAN"
+    PassWord="System_Admin1"
+    DatabaseInfo=[ip,port,SID,UserName,PassWord]
+
+    Test1()
+    Test2()
+    # Test 3
+    # Date time of Kyle's test
+    StartDate = pd.to_datetime('2018-03-17 16:07:56.164')
+    EndDate = pd.to_datetime('2018-03-17 16:59:12.000')
+    Test3()

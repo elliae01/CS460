@@ -10,6 +10,7 @@ print("Hello, Welcome to Targalytics.py")
 class Targalytics:
     df = None
     dfReaction = None
+    aTargetVisibleTimes=[]       #use append to add
 
     def __init__(self, DatabaseInfo, StartDate, EndDate):
         self.classStartDate=StartDate
@@ -79,11 +80,11 @@ class Targalytics:
         # print(sSQLCMD)
         cursor.execute(sSQLCMD)
         self.df = DataFrame(cursor.fetchall())
-        self.df.rename(columns={0: "INDEX", 1: "Date", 2: "Id", 3: "Loc.x", 4: "Loc.y", 5: "Loc.z", 6: "Hostility", 7: "Hit",
-                           8: "Heart Rate", 9: "Emg0", 10: "Emg1", 11: "Emg2", 12: "Emg3", 13: "Emg4", 14: "Emg5",
-                           15: "Emg6", 16: "Emg7", 17: "Arm.Roll", 18: "Arm.Pitch", 19: "Arm.Heading", 20: "Shot",
-                           21: "Hody.Heading", 22: "Body.Roll", 23: "Body.Pitch", 24: "Head.Heading", 25: "Head.Roll",
-                           26: "Head.Pitch"}, inplace=True)
+        self.df.rename(columns={0: "INDEX", 1: "Date", 2: "Id", 3: "Loc.x", 4: "Loc.y", 5: "Loc.z", 6: "Hostility",
+                7: "Hit", 8: "Heart Rate", 9: "Emg0", 10: "Emg1", 11: "Emg2", 12: "Emg3", 13: "Emg4", 14: "Emg5",
+                15: "Emg6", 16: "Emg7", 17: "Arm.Roll", 18: "Arm.Pitch", 19: "Arm.Heading", 20: "Shot",
+                21: "Hody.Heading", 22: "Body.Roll", 23: "Body.Pitch", 24: "Head.Heading", 25: "Head.Roll",
+                26: "Head.Pitch"}, inplace=True)
         dfCurrentEvent = (self.df['Date'] >= StartDate) & (self.df['Date'] <= EndDate)
         self.df=self.df[dfCurrentEvent]
         database.close
@@ -430,12 +431,16 @@ class Targalytics:
         return -1
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):
-        a = np.zeros((100, 100, 4))
-        print(a[1,1,1])
-        print(a[1,1,2])
-        print(a[1,2,1])
-        print(a[2,2,2])
+
+        aEvent=[]
+
+        # b.append("a")
+        # b.append("2")
+        # print(b)
+        # print("length=",len(b), "one=",b[0],b[1])
+
         return -1
+
         count=self.rowCount()
         d=-1.0     # -1 reports a failure
         if row<=count:
@@ -453,3 +458,14 @@ class Targalytics:
             print("Error ", d, " in getAvgReactionTimeBeforeRowByUser: Row = ", row, " Count = ", count)
         return d
 
+    def totalTargetVisibleCount(self):
+        dfCurrentEvent = (self.df['Id'] > 100) & (self.df['Hostility'] > 0)
+        df2=self.df[dfCurrentEvent]
+        return df2['Id'].count()
+
+    def TargetVisibleEventTimes(self):
+        aEvents=[]
+        dfCurrentEvent = (self.df['Id'] > 100) & (self.df['Hostility'] > 0)
+        df2=self.df[dfCurrentEvent]
+        aEvents=df2['Date']
+        return aEvents

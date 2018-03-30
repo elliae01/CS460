@@ -362,6 +362,7 @@ def guiMain(display_Surface,clock,T):
             DisplayTracer(display_Surface,tracer,T.getHeadHeading(iterator),targetVisible, targetLocation, targetSymbol,locSymbol)
             # Call to display the stats of the user ( surface to draw on, shot count, hit count, average reaction speed,
             # distance traveled, score)
+            distance=T.getDistanceBeforeRowByUser(iterator,1)
             DisplayStats(display_Surface, shotCount, hitCount, missCount, avgReact, distance, score)
 
             # Update the pygame display
@@ -717,6 +718,7 @@ if __name__ == '__main__':
     # Date time of Kyle's test
     StartDate = pd.to_datetime('2018-03-17 16:07:56.164')
     EndDate = pd.to_datetime('2018-03-17 16:59:12.000')
+    # StartDate = pd.to_datetime(0)
     T = Targalytics(DatabaseInfo, StartDate, EndDate)
     T.ExportToCSV('Kyles Demo')
 
