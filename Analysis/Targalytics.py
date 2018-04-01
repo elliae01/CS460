@@ -346,6 +346,10 @@ class Targalytics:
             return -1
         hits=self.getHitsBeforeRowByUser(row,user)
         miss=self.getShotsBeforeRowByUser(row,user)
+        if miss==0:
+            if hits>0:
+                return 1
+            return 0
         return hits/miss
 
     def getDistanceBeforeRowByUser(self, row, user):
