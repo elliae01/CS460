@@ -497,24 +497,39 @@ class Targalytics:
         #print("internal = ",self.dfNoteworthyEvents)      # This output is shown above ^
         return self.dfNoteworthyEvents
 
-    def listReactionTimes(self):
+    def listReactionTimes(self,user):
         keys=[]
         self.aReactionTimes.clear()
-        # for key in self.dfNoteworthyEvents:
-        #     keys.append(key)
+        for key in self.dfNoteworthyEvents:
+            keys.append(key)
         # print(keys, "array of length ",len(keys))
         count=self.dfNoteworthyEvents[keys[self.cCol4Hit]].count()
         i=0
-        while (i <= count):
+        Visible=0
+        TargetVisibleTime=0
+        TargetHitTime=0
+        ShotCount=0
+        ShotTime=0
+        Miss=0
+        while (i <= count-1):
+            # print("------------i of count : ",i,"/",count)
             TimeOfAction=self.dfNoteworthyEvents.iat[i,self.cCol4Date]
             UserID=self.dfNoteworthyEvents.iat[i,self.cCol4Id]
             Visible = self.dfNoteworthyEvents.iat[i, self.cCol4Hostility]
             Hit = self.dfNoteworthyEvents.iat[i, self.cCol4Hit]
             Shot = self.dfNoteworthyEvents.iat[i, self.cCol4Shot]
-            print("Time=", TimeOfAction)
-            print("UserID=", UserID)
-            print("Visible=", Visible)
-            print("Hit=", Hit)
-            print("Shot=", Shot)
+            # print("Time=", TimeOfAction)
+            # print("UserID=", UserID)
+            # print("Visible=", Visible)
+            # print("Hit=", Hit)
+            # print("Shot=", Shot)
+            if Visible:
+                TargetVisibleTime=TimeOfAction
+            if Shot:
+                ShotTime=TimeOfAction
+                ShotCount=ShotCount+1
+            if Hit:
+                TargetHitTime=TimeOfAction
+                self.aReactionTimes.append(TargetHitTime-TargetVisibleTime)
             i=i+1
-
+        print(self.aReactionTimes)

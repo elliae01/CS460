@@ -149,7 +149,7 @@ def Test3():
     print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
     dfReactionEvents=testEvent3.getReactionEvents()
     # print(dfReactionEvents)
-    testEvent3.listReactionTimes()
+    testEvent3.listReactionTimes(1)
     # print("1st = ",dReactionEventTimes[1])
     # for key in dReactionEventTimes:
     #     print("From Main -> ", dReactionEventTimes[key])
