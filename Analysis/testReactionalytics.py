@@ -139,12 +139,20 @@ def Test3():
     print(testEvent3.getAvgReactionTimeBeforeRowByUser(191,1))
     print("Number of Target Events (Visibile=true)",testEvent3.totalTargetVisibleCount())
     aEvents=testEvent3.TargetVisibleEventTimes()
-    print(aEvents)
+    print("Array = ",aEvents)
+    print("Array[1] = ",aEvents[1])
+    print("Array length = ", len(aEvents))
     print("Max X",testEvent3.getMaxX())
     print("Min X",testEvent3.getMinX())
     print("Max Y",testEvent3.getMaxY())
     print("Min Y",testEvent3.getMinY())
     print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
+    dfReactionEvents=testEvent3.getReactionEvents()
+    # print(dfReactionEvents)
+    testEvent3.listReactionTimes()
+    # print("1st = ",dReactionEventTimes[1])
+    # for key in dReactionEventTimes:
+    #     print("From Main -> ", dReactionEventTimes[key])
 
 
 if __name__ == '__main__':
@@ -155,8 +163,8 @@ if __name__ == '__main__':
     PassWord="System_Admin1"
     DatabaseInfo=[ip,port,SID,UserName,PassWord]
 
-    Test1()
-    Test2()
+    # Test1()
+    # Test2()
     # Test 3
     # Date time of Kyle's test
     StartDate = pd.to_datetime('2018-03-17 16:07:56.164')

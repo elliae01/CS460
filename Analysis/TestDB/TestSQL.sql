@@ -55,9 +55,8 @@ select * from TARGET_TABLE
         s.S_SHOOTER.Loc.y), max(t.T_TARGET.Loc.y), min(s.S_SHOOTER.Loc.y), min(t.T_TARGET.Loc.y)
     FROM
     Shooter_Table
-    s, Target_Table
-    t
+    s, Target_Table t
     WHERE
     t.T_INDEX > 1080
     AND
-    s.S_INDEX > 15525
+    s.S_INDEX < 15525

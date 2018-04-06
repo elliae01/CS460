@@ -10,7 +10,9 @@ print("Hello, Welcome to Targalytics.py")
 class Targalytics:
     df = None
     dfReaction = None
-    aTargetVisibleTimes=[]       #use append to add
+    aTargetVisibleTimes={}       #self.aTargetVisibleTimes.update({9999:'end'})  to add more dict items
+    dfNoteworthyEvents=None
+    aReactionTimes=[]            #use append to add more array items
 
     def __init__(self, DatabaseInfo, StartDate, EndDate):
         self.classStartDate=StartDate
@@ -471,5 +473,48 @@ class Targalytics:
         aEvents=[]
         dfCurrentEvent = (self.df['Id'] > 100) & (self.df['Hostility'] > 0)
         df2=self.df[dfCurrentEvent]
-        aEvents=df2['Date']
-        return aEvents
+        self.aTargetVisibleTimes=(df2['Date'].to_dict())    # =  {2576: Timestamp('2018-03-17 16:08:05.755000'), 2625: Timestamp('2018-03-17 16:08:15.762000'), 2699: Timestamp('2018-03-17 16:08:30.764000')}
+        #self.aTargetVisibleTimes.update({9999:'end'})      # =  {2576: Timestamp('2018-03-17 16:08:05.755000'), 2625: Timestamp('2018-03-17 16:08:15.762000'), 2699: Timestamp('2018-03-17 16:08:30.764000'), 9999: 'end'}
+        #print("internal = ",self.aTargetVisibleTimes)      # This output is shown above ^
+        for item in df2['Date']:
+            aEvents.append(item)                            # Array[1] =  2018-03-17 16:08:15.762000
+        return aEvents                                      #=  [Timestamp('2018-03-17 16:08:05.755000'), Timestamp('2018-03-17 16:08:15.762000'), Timestamp('2018-03-17 16:08:30.764000')]
+
+    def getReactionEvents(self):
+        #list all the times associated with an event that is required to calculate response time or hit/miss
+        dfCurrentEvent = (self.df['Id'] > 100) ^ ( (self.df['Id'] <= 100) & (self.df['Shot'] > 0))
+        self.dfNoteworthyEvents=self.df[dfCurrentEvent]
+        try:
+            self.dfNoteworthyEvents.to_csv("ReactionTimes.csv")
+            print("Saved ReactionTimes.csv")
+        except:
+            print("Could not save ReactionTimes.csv")
+            pass
+
+        #        self.aTargetVisibleTimes.append(df2['Date'].to_string(index=False))           #self.df.iat[row, self.cCol4LocX]
+        # self.dfNoteworthyEvents=(df2['Date'].to_dict())    # =  {2576: Timestamp('2018-03-17 16:08:05.755000'), 2625: Timestamp('2018-03-17 16:08:15.762000'), 2699: Timestamp('2018-03-17 16:08:30.764000')}
+        # self.dfNoteworthyEvents.update({9999:'end'})       # =  {2576: Timestamp('2018-03-17 16:08:05.755000'), 2625: Timestamp('2018-03-17 16:08:15.762000'), 2699: Timestamp('2018-03-17 16:08:30.764000'), 9999: 'end'}
+        #print("internal = ",self.dfNoteworthyEvents)      # This output is shown above ^
+        return self.dfNoteworthyEvents
+
+    def listReactionTimes(self):
+        keys=[]
+        self.aReactionTimes.clear()
+        # for key in self.dfNoteworthyEvents:
+        #     keys.append(key)
+        # print(keys, "array of length ",len(keys))
+        count=self.dfNoteworthyEvents[keys[self.cCol4Hit]].count()
+        i=0
+        while (i <= count):
+            TimeOfAction=self.dfNoteworthyEvents.iat[i,self.cCol4Date]
+            UserID=self.dfNoteworthyEvents.iat[i,self.cCol4Id]
+            Visible = self.dfNoteworthyEvents.iat[i, self.cCol4Hostility]
+            Hit = self.dfNoteworthyEvents.iat[i, self.cCol4Hit]
+            Shot = self.dfNoteworthyEvents.iat[i, self.cCol4Shot]
+            print("Time=", TimeOfAction)
+            print("UserID=", UserID)
+            print("Visible=", Visible)
+            print("Hit=", Hit)
+            print("Shot=", Shot)
+            i=i+1
+
