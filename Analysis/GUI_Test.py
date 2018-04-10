@@ -1,15 +1,11 @@
 import pygame
 import sys
 import time
+import cx_Oracle
 import random
 import math
+# from datetime import date
 import timestring
-import cx_Oracle
-import pandas as pd
-from Targalytics import *
-# from Analysis.Targalytics import *
-# from Server.UserInformation import *
-from datetime import datetime
 
 		# # # Control Panel Section # # #
 
@@ -198,8 +194,7 @@ def placeSymbol(display_Surface,newImg, x, y):
 def dbConnect(user, password, host, database):
 	try:
 		print("-> Connecting to database ", database, " located at ", host, " as ", user, " with password: ", password)
-		dsn_tns = cx_Oracle.makedsn(host, "1521", database)
-		database = cx_Oracle.connect(user, password, dsn_tns)
+		database = cx_Oracle.connect(user, password, host+"/"+database)
 		cursor = database.cursor()
 		print("-> Successfully connected to database - ", database, "\n")
 	except Exception as err:
@@ -223,35 +218,125 @@ def GuiSetup():
 	return display_Surface,clock
 
 # Main Gui Method
-def guiMain(display_Surface,clock,T):
+def guiMain(display_Surface,cursor,clock):
 			# # # Database Section # # #
 	# Executes the main SQL query and assigns the list to 'data_array'
 	# cursor.execute('(SELECT s.S_INDEX,s.S_DATE AS time,s.S_SHOOTER.Id AS id,s.S_SHOOTER.Loc.x AS x,s.S_SHOOTER.Loc.y AS y,s.S_SHOOTER.shot AS shot, NULL AS hit, NULL AS visible, s.S_SHOOTER.head.heading AS heading,s.S_SHOOTER.arm.emg.emg0 AS emg0,s.S_SHOOTER.arm.emg.emg1 AS emg1,s.S_SHOOTER.arm.emg.emg2 AS emg2,s.S_SHOOTER.arm.emg.emg3 AS emg3,s.S_SHOOTER.arm.emg.emg4 AS emg4,s.S_SHOOTER.arm.emg.emg5 AS emg5,s.S_SHOOTER.arm.emg.emg6 AS emg6,s.S_SHOOTER.arm.emg.emg7 AS emg7,s.S_SHOOTER.arm.roll AS ARM_ROLL,s.S_SHOOTER.arm.pitch AS ARM_PITCH,s.S_SHOOTER.arm.heading AS ARM_YAW  FROM Shooter_Table s WHERE s.S_INDEX>15525) UNION ALL (SELECT t.T_INDEX,t.T_DATE AS time,t.T_TARGET.ID AS id,t.T_TARGET.Loc.x AS x, t.T_TARGET.Loc.y AS y,NULL AS shot, t.T_TARGET.hit AS hit, t.T_TARGET.visible AS visible, NULL AS heading, NULL AS emg0,NULL AS emg1,NULL AS emg2,NULL AS emg3,NULL AS emg4,NULL AS emg5,NULL AS emg6,NULL AS emg7, NULL AS ARM_ROLL, NULL AS ARM_PITCH, NULL AS ARM_YAW FROM Target_Table t WHERE  t.T_INDEX>1080) ORDER BY time')
-	# data_array = cursor.fetchall()
+	
+	# data_array = cursor.fetchall()  #XXX
+	data_array = [
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		[1, timestring.Date("29-MAR-18 12.29.53.864000 AM"), 1, random.randint(-300,300), random.randint(-300,300), 78, 1, 0, 61, 1, 2, 3, 4, 5, 6, 7, 8, 23.2, 31.5, 87.3, 0, 32.4, 57.3, 27.2, 21.4, 77.3, 29.2],
+		]
+
 	# Executes an SQL query to find the minimum and maximum values for both X and Y coordinates of the target and user
 	# Then assigns it to 'calibration_array'
 	# cursor.execute('SELECT max(s.S_SHOOTER.Loc.x), max(t.T_TARGET.Loc.x), min(s.S_SHOOTER.Loc.x),min(t.T_TARGET.Loc.x),max(s.S_SHOOTER.Loc.y), max(t.T_TARGET.Loc.y), min(s.S_SHOOTER.Loc.y),min(t.T_TARGET.Loc.y) FROM Shooter_Table s, Target_Table t WHERE  t.T_INDEX>1080 AND s.S_INDEX>15525')
-	# calibration_array = cursor.fetchall()
+	
+	# calibration_array = cursor.fetchall()   #XXX
+	calibration_array = [[300, 400, -300, -400, 300, 400, -300, -400]]
 
 	# Finds the maximum and minimum values for X and Y taking into consideration the target and the user
 	# Then assigns them
-	# max_x = max(calibration_array[0][0], calibration_array[0][1])
-	# if max_x!=T.getMaxX():
-	#     print("MaxX error")
-	# min_x = min(calibration_array[0][2], calibration_array[0][3])
-	# if min_x!=T.getMinX():
-	#     print("MinX error: min_x = ",min_x, " and getMinX=", T.getMinX())
-	# max_y = max(calibration_array[0][4], calibration_array[0][5])
-	# if max_y!=T.getMaxY():
-	#     print("MaxY error")
-	# min_y = min(calibration_array[0][6], calibration_array[0][7])
-	# if min_y != T.getMinY():
-	#     print("MinY error: min_y = ",min_y, " and getMinY=", T.getMinY())
-	#
-	max_x = T.getMaxX()
-	min_x = T.getMinX()
-	max_y = T.getMaxY()
-	min_y = T.getMinY()
+	max_x = max(calibration_array[0][0], calibration_array[0][1])
+	min_x = min(calibration_array[0][2], calibration_array[0][3])
+	max_y = max(calibration_array[0][4], calibration_array[0][5])
+	min_y = min(calibration_array[0][6], calibration_array[0][7])
 
 	# Initializes a tracer object with the parameters ( window starting X, window starting Y, width of tracer window, height of tracer window)
 	tracer = Tracer(20,banner_height+20,tracer_width,tracer_heigth)
@@ -294,7 +379,7 @@ def guiMain(display_Surface,clock,T):
 	targetVisible = None
 	targetLocation = None
 	emg = []
-	arm_orientNew = []
+	arm_orient = []
 	# Set the slider off so that the playloop is on by default
 	startScrubLoop = False
 
@@ -325,7 +410,7 @@ def guiMain(display_Surface,clock,T):
 					slider.hit = False
 
 
-					# # # Drawing operations to setup window # # #
+			# # # Drawing operations to setup window # # #
 
 			# Fills the background with BLACK prior to drawing anything
 			display_Surface.fill(BLACK)
@@ -369,7 +454,7 @@ def guiMain(display_Surface,clock,T):
 
 				# Converts the location X and Y at the current record to the scaled location
 				# of X and Y that fit the tracer window
-				x,y = tracer.convert_point_To_fit(T.getX(iterator),T.getY(iterator))
+				x, y = tracer.convert_point_To_fit(current[3], current[4])
 				if (current[2] <= 100):
 					# Sets the scaled location of the user to 'newPoint'
 					newPoint = Coordinate(x, y)
@@ -377,18 +462,7 @@ def guiMain(display_Surface,clock,T):
 					tracer.add_tracer(newPoint)
 				iteratorPast += 1
 
-			tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array = ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array)
-
-			# VVVVVVV Junk? VVVVVVV
-			# assigns 'current' with the record that takes place at the 'iterator'
-			# current = data_array[iterator]
-			# Converts the location X and Y at the current record to the scaled location
-			# of X and Y that fit the tracer window
-			# if current[3]!=T.getX(iterator):
-			#     print("Error with x = ",x)
-			# if current[4] != T.getY(iterator):
-			#     print("Error with y = ", y)
-			# ^^^^^^^ Junk? ^^^^^^^
+			tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orient, hitCount, missCount, visibleMarker, shotCount, iterator, data_array = ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orient, hitCount, missCount, visibleMarker, shotCount, iterator, data_array)
 
 			# Sets the hit miss ratio
 			if(hitCount > 0):
@@ -399,13 +473,12 @@ def guiMain(display_Surface,clock,T):
 			# Call to display the EMG Values ( surface to draw on, emg list)
 			DisplayEMG(display_Surface,emg)
 			# Call to display the Arm Orientation Values ( surface to draw on, arm orientation list)
-			DisplayArmOrient(display_Surface, arm_orientNew)
+			DisplayArmOrient(display_Surface, arm_orient)
 			# Call to display the tracer window ( surface to draw on, tracer object, heading, target visible variable,
 			# target location Coordinate, target Symbol, location symbol)
-			DisplayTracer(display_Surface,tracer,T.getHeadHeading(iterator),targetVisible, targetLocation, targetSymbol,locSymbol)
+			DisplayTracer(display_Surface,tracer,current[8],targetVisible, targetLocation, targetSymbol,locSymbol)
 			# Call to display the stats of the user ( surface to draw on, shot count, hit count, average reaction speed,
 			# distance traveled, score)
-			distance=T.getDistanceBeforeRowByUser(iterator,1)
 			DisplayStats(display_Surface, shotCount, hitCount, missCount, avgReact, distance, score)
 
 			if slider.hit:
@@ -421,34 +494,27 @@ def guiMain(display_Surface,clock,T):
 			print(err)
 			break
 
-def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array):
+def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orient, hitCount, missCount, visibleMarker, shotCount, iterator, data_array):
 		# # # Target Handling Section # # #
 	# Checks if the ID of the record is greater than 100 which indicates a target
-	# if T.getID(iterator) != current[2]:
-	#     print("Error with ID",current[2])
-	if(T.getID(iterator) > 100):
+	if(current[2] > 100):
 
 		# Checks if the target reports that it became visible
-		# if T.getTargetVisible(iterator) != current[7]:
-		#     print("Error with Visible = ", current[7])
-		# if T.getHit(iterator) != current[6]:
-		#     print("Error with Hit = ", current[6])
-		if(T.getTargetVisible(iterator) == 1):
+		if(current[7] == 1):
 			# Sets the 'visibleMarker' variable to the time stamp of the record
-			visibleMarker = T.getDate(iterator)
-			# if current[1] != T.getDate(iterator):
-			#     print("Error with Date = ",visibleMarker)
+			visibleMarker = current[1]
 			# Sets the 'targetVisible' variable to True
 			targetVisible = 1
 			# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
 			targetLocation = Coordinate(x, y)
 
 		# Checks if the targets reports that it was hit
-		elif(T.getHit(iterator) == 1):
+		elif(current[6] == 1):
 			# Sets the 'targetVisible' variable to False
 			targetVisible = 0
 			# sets 'reaction' to the current reaction speed of the shooter to hit the target
-			reaction = T.getDate(iterator) - visibleMarker
+			reaction = current[1] - visibleMarker
+			print("*** REACTION:",reaction)
 			# Adds the new reaction to the list of reactions
 			reactionList.append(to_float(reaction))
 			# Sets the 'reactionSum' variable to 0 to clear it.
@@ -463,25 +529,16 @@ def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x,
 
 		# # # User Handling Section # # #
 	else:
-		# Sets the scaled location of the user to 'newPoint'
-		newPoint = Coordinate(x, y)
-		# Adds the new point to the tracer array within the tracer object
-		tracer.add_tracer(newPoint)
 		# Checks if the user fired a shot
-		# if T.getShot(iterator) != current[5]:
-		#     print("Error with shot", current[5], " vs ",T.getShot(iterator))
-		if(T.getShot(iterator) == 1):
+		if(current[5] == 1):
 			# Adds one to the 'shotCount' variable
 			shotCount = shotCount + 1
 
 			#This section checks the next few records to find if the user hit or missed the target
 			checkHitMissIterator = iterator-1
 			while checkHitMissIterator < iterator + 3:
-				# nextRecords = data_array[checkHitMissIterator]
-				nextRecords = T.getHit(checkHitMissIterator)
-				# if (T.getHit(checkHitMissIterator) != 0 and nextRecords[6]==None):
-				#     print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
-				if(T.getHit(checkHitMissIterator) == 1):
+				nextRecords = data_array[checkHitMissIterator]
+				if(nextRecords[6] == 1):
 					hitCount += 1
 					break
 				elif (checkHitMissIterator == iterator + 2):
@@ -489,17 +546,11 @@ def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x,
 				checkHitMissIterator +=1
 
 		# Sets the emg values
-		# emg = current[9:17]
-		# if T.getEmgArray(iterator) != emg:
-		#     print("emg Error",emg, 'T=', T.getEmgArray(iterator))
-		emg = T.getEmgArray(iterator)
+		emg = current[9:17]
 		# Sets the arm orientation values
-		# arm_orient = current[17:20]   #was 18:20 but that fails the test below by bringing in only the first 2 elements of Arm
-		arm_orientNew= T.getArmArray(iterator)
-		# if arm_orientNew != arm_orient:
-		#      print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
+		arm_orient = current[18:20]
 
-	return (tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array)
+	return (tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orient, hitCount, missCount, visibleMarker, shotCount, iterator, data_array)
 
 # takes a date time and converts it to a float
 def to_float(dt_time):
@@ -580,10 +631,10 @@ def DisplayArmOrient(display_Surface,newArm):
 	arm1 = font.render('Arm Roll - ' + str(newArm[0]), 1, arm_color)
 	arm1pos = arm1.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow))
 
-	arm2 = font.render('Arm Pitch - ' + str(newArm[1]), 1, arm_color)
+	arm2 = font.render('Arm Pitch - ' + str(newArm[0]), 1, arm_color)
 	arm2pos = arm2.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow + verticle_spacing))
 
-	arm3 = font.render('Arm Yaw - ' + str(newArm[2]), 1, arm_color)
+	arm3 = font.render('Arm Yaw - ' + str(newArm[0]), 1, arm_color)
 	arm3pos = arm3.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow + verticle_spacing*2))
 
 	# Draws the orientation text to the window
@@ -601,7 +652,7 @@ def averageTracer(list):
 		firstElement = None
 		secondElement = None
 		for element in list:
-			if(firstElement and secondElement != None):
+			if(firstElement is not None and secondElement is not None):
 				averageX = (firstElement.getX() + secondElement.getX() + element.getX()) / 3
 				averageY = (firstElement.getY() + secondElement.getY() + element.getY()) / 3
 				newCoordinate = Coordinate(averageX,averageY)
@@ -622,19 +673,20 @@ def DisplayTracer(display_Surface,tracer,heading,targetVisible, targetLocation, 
 	# Assigns list to the list stored in the tracer object
 	list = tracer.get_tracer()
 	# Calls to average the location of the user
-	list = averageTracer(list)
+	# list = averageTracer(list)
 	# Initializes 'pastElement' to None
 	pastElement = None
+	# Sets up variable to track if initial point was just plotted
+	initialPointPlotted = False
 	# Iterator counts the loop
 	iterator = 0
 	# Loops through each element in the tracer list
 	for element in list:
 		# If it is the first element
 		if(pastElement == None):
-				# Assign the previous element to the current element
-				pastElement = element
-				# increment iterator
-				iterator += 1
+			# Assign the previous element to the current element
+			pastElement = element
+			initialPointPlotted = True
 		# This is not the first element
 		else:
 				# Draws the line of the tracer in 4 different colors depending on where it exists in order
@@ -648,13 +700,18 @@ def DisplayTracer(display_Surface,tracer,heading,targetVisible, targetLocation, 
 				# Draw a line between the previous point and the current point
 				pygame.draw.line(display_Surface, LIGHT_RED, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
 			else:
-				# Draw a line between the previous point and the current point
-				pygame.draw.line(display_Surface, GREY, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+				if(initialPointPlotted):
+					# Draw a line between the previous point and the current point
+					pygame.draw.line(display_Surface, BRIGHT_RED, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
+					initialPointPlotted = False
+				else:
+					# Draw a line between the previous point and the current point
+					pygame.draw.line(display_Surface, GREY, [pastElement.getX(), pastElement.getY()],[element.getX(), element.getY()], 4)
 
 			# Assign the previous element to the current element
 			pastElement = element
 			# increment iterator
-			iterator += 1
+		iterator += 1
 
 	# Checks if there is a heading
 	# If there is a heading it is a user we can place the symbol for
@@ -727,7 +784,7 @@ def orientation(originalSymbol,heading):
 	return facing
 
 # Is called when the end of analysis is detected
-def endHandler(display_Surface, clock):
+def endHandler(display_Surface, clock, cursor):
 	end_color = BLACK
 	font_size = 30
 	start_of_window_width = display_width/4
@@ -790,7 +847,7 @@ def endHandler(display_Surface, clock):
 				display_Surface.blit(analyze, analyzepos)
 				pygame.display.update()
 				if(click[0] == 1):
-					guiMain(display_surface, clock, T)
+					guiMain(display_surface, cursor, clock)
 			else:
 				display_Surface.fill(BLACK, [start_of_window_width + space_to_first_button,
 											 start_of_window_height + drop_to_button, button_width, button_height])
@@ -829,23 +886,9 @@ def endHandler(display_Surface, clock):
 				pygame.display.update()
 
 if __name__ == '__main__':
-	ip = 'localhost'
-	port = 1521
-	SID = 'orcl'
-	UserName = "SYSMAN"
-	PassWord = "System_Admin1"
-	DatabaseInfo = [ip, port, SID, UserName, PassWord]
-
-	# All in Database
-	StartDate = pd.to_datetime(0)
-	EndDate = datetime.now()
-
-	# Date time of Kyle's test
-	StartDate = pd.to_datetime('2018-03-17 16:07:56.164')
-	EndDate = pd.to_datetime('2018-03-17 16:59:12.000')
-
-	T = Targalytics(DatabaseInfo, StartDate, EndDate)
-	T.ExportToCSV('Kyles Demo')
-
 	display_surface,clock = GuiSetup()
-	guiMain(display_surface, clock, T)
+
+	# Connects to the database using parameters in 'Control Panel' at top
+	# database, cursor = dbConnect(user, password, host, database_name) #XXX
+	cursor = None   #XXX
+	guiMain(display_surface,cursor, clock)
