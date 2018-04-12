@@ -13,6 +13,9 @@ class Targalytics:
     aTargetVisibleTimes={}       #self.aTargetVisibleTimes.update({9999:'end'})  to add more dict items
     dfNoteworthyEvents=None
     aReactionTimes=[]            #use append to add more array items
+    HitCount = 0
+    ShotCount = 0
+    Miss = 0
 
     def __init__(self, DatabaseInfo, StartDate, EndDate):
         self.classStartDate=StartDate
@@ -252,7 +255,12 @@ class Targalytics:
     def getHeadPitch(self, row):
         return self.df.iat[row, self.cCol4HeadPitch]
 
+    def getLength(self):
+        # size or number of rows
+        return self.df['INDEX'].count()
+
     def rowCount(self):
+        #size or length
         return self.df['INDEX'].count()
 
     def columnCount(self):
@@ -498,6 +506,8 @@ class Targalytics:
         return self.dfNoteworthyEvents
 
     def listReactionTimes(self,user):
+        if self.dfNoteworthyEvents is None:
+            dfReactionEvents=self.getReactionEvents()
         keys=[]
         self.aReactionTimes.clear()
         for key in self.dfNoteworthyEvents:
@@ -507,10 +517,8 @@ class Targalytics:
         i=0
         Visible=0
         TargetVisibleTime=0
-        TargetHitTime=0
-        ShotCount=0
         ShotTime=0
-        Miss=0
+        ReactionSum=0
         while (i <= count-1):
             # print("------------i of count : ",i,"/",count)
             TimeOfAction=self.dfNoteworthyEvents.iat[i,self.cCol4Date]
@@ -525,11 +533,98 @@ class Targalytics:
             # print("Shot=", Shot)
             if Visible:
                 TargetVisibleTime=TimeOfAction
-            if Shot:
+            if Shot==1:
                 ShotTime=TimeOfAction
-                ShotCount=ShotCount+1
+                self.ShotCount=self.ShotCount+1
             if Hit:
                 TargetHitTime=TimeOfAction
-                self.aReactionTimes.append(TargetHitTime-TargetVisibleTime)
+                self.HitCount=self.HitCount+1
+                ReactionTime=TargetHitTime-TargetVisibleTime
+                print(ReactionTime._s)
+                ReactionSum=ReactionSum+(ReactionTime.delta)
+                self.aReactionTimes.append(ReactionTime)
             i=i+1
+            self.Miss=self.ShotCount-self.HitCount
+        AveReactionTime=(ReactionSum/len(self.aReactionTimes))/1000000000.0
         print(self.aReactionTimes)
+        # print("Number of Shots = ", self.ShotCount, ", Hits=", self.HitCount, ", Misses=", self.Miss)
+        HitMissRatio=0
+        if (self.Miss+self.HitCount)>0:
+            HitMissRatio=self.HitCount/(self.Miss+self.HitCount)
+            # print("Hit/Miss Ratio=",HitMissRatio)
+        # print("Length of list=",len(self.aReactionTimes))
+        # print("Average Reaction Time=",AveReactionTime, " seconds.")
+        # print("Average Reaction Time=",AveReactionTime, " seconds.")
+        score =0
+        if AveReactionTime>0:
+            score = HitMissRatio*(1000/AveReactionTime)
+        return AveReactionTime, self.HitCount, self.Miss, HitMissRatio, self.ShotCount, score
+
+    def listReactionTimesUpToRow(self, row, user):
+        ShotCount=0
+        HitCount=0
+        Miss=0
+        if self.dfNoteworthyEvents is None:
+            dfReactionEvents=self.getReactionEvents()
+        keys=[]
+        self.aReactionTimes.clear()
+        for key in self.dfNoteworthyEvents:
+            keys.append(key)
+        # print(keys, "array of length ",len(keys))
+        row=np.int32(row)
+        count=self.dfNoteworthyEvents[keys[self.cCol4Hit]].count()
+        count=self.df['INDEX'].count()
+        if count < row:
+            print("Error: row > data count (Not enough data or view past end of data) Max=",count)
+            return -1
+        count=row
+        i=0
+        Visible=0
+        TargetVisibleTime=0
+        ShotTime=0
+        ReactionSum=0
+        while (i <= count-1):
+            # print("------------i of count : ",i,"/",count)
+            TimeOfAction=self.df.iat[i,self.cCol4Date]
+            UserID=self.df.iat[i,self.cCol4Id]
+            Hit=0
+            Visible=0
+            if UserID>100:
+                Visible = self.df.iat[i, self.cCol4Hostility]
+                Hit = self.df.iat[i, self.cCol4Hit]
+            Shot = self.df.iat[i, self.cCol4Shot]
+            # print("Time=", TimeOfAction)
+            # print("UserID=", UserID)
+            # print("Visible=", Visible)
+            # print("Hit=", Hit)
+            # print("Shot=", Shot)
+            if Visible>0:
+                TargetVisibleTime=TimeOfAction
+            if Shot==1:
+                ShotTime=TimeOfAction
+                ShotCount=ShotCount+1
+            if Hit>0:
+                TargetHitTime=TimeOfAction
+                HitCount=HitCount+1
+                ReactionTime=TargetHitTime-TargetVisibleTime
+                # print("ReactionTime._s=",ReactionTime._s)
+                ReactionSum=ReactionSum+(ReactionTime.delta)
+                self.aReactionTimes.append(ReactionTime)
+            i=i+1
+            Miss=ShotCount-HitCount
+        AveReactionTime=0
+        if len(self.aReactionTimes)>0:
+            AveReactionTime=(ReactionSum/len(self.aReactionTimes))/1000000000.0
+
+        # print(self.aReactionTimes)
+        # print("Number of Shots = ", ShotCount, ", Hits=", HitCount, ", Misses=", Miss)
+        HitMissRatio=0
+        if (Miss+HitCount)>0:
+            HitMissRatio=HitCount/(Miss+HitCount)
+            # print("Hit/Miss Ratio=",HitMissRatio)
+        # print("Length of list=",len(self.aReactionTimes))
+        # print("Average Reaction Time=",AveReactionTime, " seconds.")
+        score =0 
+        if AveReactionTime>0:
+            score = HitMissRatio*(1000/AveReactionTime)
+        return AveReactionTime, HitCount, Miss, HitMissRatio, ShotCount,score

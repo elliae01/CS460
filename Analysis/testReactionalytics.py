@@ -147,13 +147,22 @@ def Test3():
     print("Max Y",testEvent3.getMaxY())
     print("Min Y",testEvent3.getMinY())
     print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
-    dfReactionEvents=testEvent3.getReactionEvents()
+    # dfReactionEvents=testEvent3.getReactionEvents()
     # print(dfReactionEvents)
-    testEvent3.listReactionTimes(1)
+    AveReactionTime, HitCount, Miss, HitMissRatio, ShotCount, score = testEvent3.listReactionTimesUpToRow(190,1)
     # print("1st = ",dReactionEventTimes[1])
     # for key in dReactionEventTimes:
     #     print("From Main -> ", dReactionEventTimes[key])
-
+    print("Number of Shots = ", ShotCount, ", Hits=", HitCount, ", Misses=", Miss)
+    print("Hit/Miss Ratio=", HitMissRatio)
+    print("Average Reaction Time=", AveReactionTime, " seconds.")
+    AveReactionTime, HitCount, Miss, HitMissRatio, ShotCount, score = testEvent3.listReactionTimes(1)
+    # print("1st = ",dReactionEventTimes[1])
+    # for key in dReactionEventTimes:
+    #     print("From Main -> ", dReactionEventTimes[key])
+    print("Number of Shots = ", ShotCount, ", Hits=", HitCount, ", Misses=", Miss)
+    print("Hit/Miss Ratio=", HitMissRatio)
+    print("Average Reaction Time=", AveReactionTime, " seconds.")
 
 if __name__ == '__main__':
     ip = 'localhost'

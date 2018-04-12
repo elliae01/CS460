@@ -196,6 +196,7 @@ def placeSymbol(display_Surface,newImg, x, y):
 	display_Surface.blit(newImg, (x, y))
 
 def dbConnect(user, password, host, database):
+	#old method to connect
 	try:
 		print("-> Connecting to database ", database, " located at ", host, " as ", user, " with password: ", password)
 		dsn_tns = cx_Oracle.makedsn(host, "1521", database)
@@ -233,21 +234,6 @@ def guiMain(display_Surface,clock,T):
 	# cursor.execute('SELECT max(s.S_SHOOTER.Loc.x), max(t.T_TARGET.Loc.x), min(s.S_SHOOTER.Loc.x),min(t.T_TARGET.Loc.x),max(s.S_SHOOTER.Loc.y), max(t.T_TARGET.Loc.y), min(s.S_SHOOTER.Loc.y),min(t.T_TARGET.Loc.y) FROM Shooter_Table s, Target_Table t WHERE  t.T_INDEX>1080 AND s.S_INDEX>15525')
 	# calibration_array = cursor.fetchall()
 
-	# Finds the maximum and minimum values for X and Y taking into consideration the target and the user
-	# Then assigns them
-	# max_x = max(calibration_array[0][0], calibration_array[0][1])
-	# if max_x!=T.getMaxX():
-	#     print("MaxX error")
-	# min_x = min(calibration_array[0][2], calibration_array[0][3])
-	# if min_x!=T.getMinX():
-	#     print("MinX error: min_x = ",min_x, " and getMinX=", T.getMinX())
-	# max_y = max(calibration_array[0][4], calibration_array[0][5])
-	# if max_y!=T.getMaxY():
-	#     print("MaxY error")
-	# min_y = min(calibration_array[0][6], calibration_array[0][7])
-	# if min_y != T.getMinY():
-	#     print("MinY error: min_y = ",min_y, " and getMinY=", T.getMinY())
-	#
 	max_x = T.getMaxX()
 	min_x = T.getMinX()
 	max_y = T.getMaxY()
@@ -259,8 +245,6 @@ def guiMain(display_Surface,clock,T):
 
 	# Calls to find the scale factor to apply to the X and Y to scale input to fit in the window.
 	tracer.find_scale_factors(min_x,max_x,min_y,max_y)
-
-
 
 	# # # Image Assignment Section # # #
 
@@ -275,7 +259,7 @@ def guiMain(display_Surface,clock,T):
 
 
 	# # # Slider Initialization # # #
-	slider = Slider(display_Surface, "Slider", 0, 0, len(data_array)-1, 0, 700)
+	slider = Slider(display_Surface, "Slider", 0, 0, T.getLength()-1, 0, 0)
 
 	# # # Initialization Section # # #
 
@@ -318,7 +302,7 @@ def guiMain(display_Surface,clock,T):
 						slider.hit = True
 						startScrubLoop = True
 					else:
-						if(startScrubLoop and (iterator >= len(data_array) - 1)):
+						if(startScrubLoop and (iterator >= T.getLength() - 1)):
 							iterator = 0
 						startScrubLoop = not startScrubLoop
 				elif event.type == pygame.MOUSEBUTTONUP:
@@ -340,7 +324,7 @@ def guiMain(display_Surface,clock,T):
 			# # # End condition checking # # #
 
 			# Switches to scrubbing if the end of data session is reached
-			if(iterator >= len(data_array) - 1):
+			if(iterator >= T.getLength() - 1):
 				startScrubLoop = True
 
 
@@ -348,15 +332,14 @@ def guiMain(display_Surface,clock,T):
 
 			# Scrub by setting the loop variable to the slider value, thus driving the currently displayed data
 			if(startScrubLoop):
-				print("Scrubbing...")
+				# print("Scrubbing...")
 				iterator = slider.val
 			# We are in play mode and increment the iterator each time it is drawn
 			# so that it animates and update the position of the slider.
 			else:
-				print("Playing...")
 				iterator += 1
+				# print("Playing...",iterator, T.getID(iterator))
 				slider.setPosition(iterator)
-
 
 			# # # Displays data up to value of slider # # #
 
@@ -365,40 +348,37 @@ def guiMain(display_Surface,clock,T):
 			tracer.clear_tracer()
 			while(iteratorPast <= iterator):
 				# assigns 'current' with the record that takes place at the 'iterator'
-				current = data_array[iteratorPast]
+				#current = data_array[iteratorPast]
 
 				# Converts the location X and Y at the current record to the scaled location
 				# of X and Y that fit the tracer window
-				x,y = tracer.convert_point_To_fit(T.getX(iterator),T.getY(iterator))
-				if (current[2] <= 100):
+				x,y = tracer.convert_point_To_fit(T.getX(iteratorPast),T.getY(iteratorPast))
+				if (T.getID(iterator) <= 200):
 					# Sets the scaled location of the user to 'newPoint'
 					newPoint = Coordinate(x, y)
 					# Adds the new point to the tracer array within the tracer object
 					tracer.add_tracer(newPoint)
 				iteratorPast += 1
 
-			tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array = ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array)
+			avgReact, hitCount, missCount, HitMissRatio, shotCount, score = T.listReactionTimesUpToRow(iterator, 1)
+			# targetVisible=T.getTargetVisible(iterator)
+			# print(iterator, avgReact, hitCount, missCount, HitMissRatio, shotCount, score, targetVisible)
 
-			# VVVVVVV Junk? VVVVVVV
-			# assigns 'current' with the record that takes place at the 'iterator'
-			# current = data_array[iterator]
-			# Converts the location X and Y at the current record to the scaled location
-			# of X and Y that fit the tracer window
-			# if current[3]!=T.getX(iterator):
-			#     print("Error with x = ",x)
-			# if current[4] != T.getY(iterator):
-			#     print("Error with y = ", y)
-			# ^^^^^^^ Junk? ^^^^^^^
-
-			# Sets the hit miss ratio
-			if(hitCount > 0):
-				hitMiss = hitCount/(missCount+hitCount)
-			if(avgReact > 0):
-				score = hitMiss*(1000/avgReact)
+			if (T.getID(iterator) > 100):
+				if (T.getTargetVisible(iterator) == 1):
+					# Sets the 'visibleMarker' variable to the time stamp of the record
+					visibleMarker = T.getDate(iterator)
+					targetVisible = 1
+					# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
+					targetLocation = Coordinate(T.getX(iterator), T.getY(iterator))
+				if (T.getTargetVisible(iterator) == 0):
+					targetVisible = 0
 
 			# Call to display the EMG Values ( surface to draw on, emg list)
+			emg = T.getEmgArray(iterator)
 			DisplayEMG(display_Surface,emg)
 			# Call to display the Arm Orientation Values ( surface to draw on, arm orientation list)
+			arm_orientNew = T.getArmArray(iterator)
 			DisplayArmOrient(display_Surface, arm_orientNew)
 			# Call to display the tracer window ( surface to draw on, tracer object, heading, target visible variable,
 			# target location Coordinate, target Symbol, location symbol)
@@ -421,24 +401,17 @@ def guiMain(display_Surface,clock,T):
 			print(err)
 			break
 
-def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array):
+def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, T,
+				visibleMarker, shotCount, iterator):
 		# # # Target Handling Section # # #
 	# Checks if the ID of the record is greater than 100 which indicates a target
-	# if T.getID(iterator) != current[2]:
-	#     print("Error with ID",current[2])
+	x=T.getX(iterator)
+	y=T.getY(iterator)
+	targetVisible = 0
 	if(T.getID(iterator) > 100):
-
-		# Checks if the target reports that it became visible
-		# if T.getTargetVisible(iterator) != current[7]:
-		#     print("Error with Visible = ", current[7])
-		# if T.getHit(iterator) != current[6]:
-		#     print("Error with Hit = ", current[6])
 		if(T.getTargetVisible(iterator) == 1):
 			# Sets the 'visibleMarker' variable to the time stamp of the record
 			visibleMarker = T.getDate(iterator)
-			# if current[1] != T.getDate(iterator):
-			#     print("Error with Date = ",visibleMarker)
-			# Sets the 'targetVisible' variable to True
 			targetVisible = 1
 			# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
 			targetLocation = Coordinate(x, y)
@@ -454,13 +427,6 @@ def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x,
 			# Sets the 'reactionSum' variable to 0 to clear it.
 			reactionSum = 0
 
-			# Loops through all the reaction speeds to find the sum then divide by the number of records
-			# to find an average reaction speed for the user.
-			for records in reactionList:
-				reactionSum += records
-			avgReact = reactionSum / len(reactionList)
-
-
 		# # # User Handling Section # # #
 	else:
 		# Sets the scaled location of the user to 'newPoint'
@@ -470,36 +436,38 @@ def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, current, x,
 		# Checks if the user fired a shot
 		# if T.getShot(iterator) != current[5]:
 		#     print("Error with shot", current[5], " vs ",T.getShot(iterator))
-		if(T.getShot(iterator) == 1):
-			# Adds one to the 'shotCount' variable
-			shotCount = shotCount + 1
-
-			#This section checks the next few records to find if the user hit or missed the target
-			checkHitMissIterator = iterator-1
-			while checkHitMissIterator < iterator + 3:
-				# nextRecords = data_array[checkHitMissIterator]
-				nextRecords = T.getHit(checkHitMissIterator)
-				# if (T.getHit(checkHitMissIterator) != 0 and nextRecords[6]==None):
-				#     print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
-				if(T.getHit(checkHitMissIterator) == 1):
-					hitCount += 1
-					break
-				elif (checkHitMissIterator == iterator + 2):
-					missCount += 1
-				checkHitMissIterator +=1
-
+		# hitCount=T.getHitsBeforeRowByUser(iterator,1)
+		# if(T.getShot(iterator) == 1):
+		# 	# Adds one to the 'shotCount' variable
+		# 	shotCount = shotCount + 1
+        #
+		# 	#This section checks the next few records to find if the user hit or missed the target
+		# 	checkHitMissIterator = iterator-1
+		# 	while checkHitMissIterator < iterator + 3:
+		# 		# nextRecords = data_array[checkHitMissIterator]
+		# 		nextRecords = T.getHit(checkHitMissIterator)
+		# 		# if (T.getHit(checkHitMissIterator) != 0 and nextRecords[6]==None):
+		# 		#     print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
+		# 		if iterator == 75:
+		# 			print("Hitcount")
+		# 		if(T.getHit(checkHitMissIterator) == 1):
+		# 			hitCount += 1
+		# 			break
+		# 		elif (checkHitMissIterator == iterator + 2):
+		# 			missCount += 1
+		# 		checkHitMissIterator +=1
+        #
 		# Sets the emg values
 		# emg = current[9:17]
 		# if T.getEmgArray(iterator) != emg:
 		#     print("emg Error",emg, 'T=', T.getEmgArray(iterator))
-		emg = T.getEmgArray(iterator)
+		# emg = T.getEmgArray(iterator)
 		# Sets the arm orientation values
 		# arm_orient = current[17:20]   #was 18:20 but that fails the test below by bringing in only the first 2 elements of Arm
-		arm_orientNew= T.getArmArray(iterator)
+		# arm_orientNew= T.getArmArray(iterator)
 		# if arm_orientNew != arm_orient:
 		#      print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
-
-	return (tracer, reactionList, targetLocation, targetVisible, current, x, y, emg, arm_orientNew, hitCount, missCount, visibleMarker, shotCount, iterator, data_array)
+	return (tracer, reactionList, targetLocation, targetVisible, visibleMarker, shotCount, iterator)
 
 # takes a date time and converts it to a float
 def to_float(dt_time):
@@ -618,6 +586,7 @@ def averageTracer(list):
 # Draws the tracer window and its components to the window
 def DisplayTracer(display_Surface,tracer,heading,targetVisible, targetLocation, targetSymbol,locSymbol):
 	# Fills the section of the window with a white background
+	# print("DisplayTracer ", targetVisible)
 	display_Surface.fill(WHITE,[20,banner_height+20,tracer_width,tracer_heigth])
 	# Assigns list to the list stored in the tracer object
 	list = tracer.get_tracer()
@@ -667,7 +636,8 @@ def DisplayTracer(display_Surface,tracer,heading,targetVisible, targetLocation, 
 	# Checks if the target is visible
 	if(targetVisible == 1):
 		# Places the symbol of the target
-		placeSymbol(display_Surface, targetSymbol, targetLocation.getX()+40, targetLocation.getY()-520)
+		# print("Place Symbol",targetLocation.getX(),targetLocation.getY())
+		placeSymbol(display_Surface, targetSymbol, targetLocation.getX()-100, targetLocation.getY()+180)
 
 # Draws the stats to the window
 def DisplayStats(display_Surface, shotCount, hits, misses, avgReact, distance, score):
