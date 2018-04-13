@@ -1,0 +1,52 @@
+DROP TABLE Shooter_Table;
+DROP TABLE Target_Table;
+DROP TYPE TARGET;
+DROP TYPE SHOOTER;
+DROP TYPE ENTITY;
+DROP TYPE Arm_Obj;
+DROP TYPE Emg_Obj;
+DROP TYPE Orient_Obj;
+DROP TYPE Loc_Obj;
+
+
+
+CREATE TYPE Loc_Obj AS OBJECT
+(x NUMBER, y NUMBER, z NUMBER);
+
+CREATE TYPE Orient_Obj AS OBJECT
+(heading FLOAT, roll FLOAT, pitch FLOAT);
+
+CREATE TYPE Emg_Obj AS OBJECT
+(emg0 NUMBER, emg1 NUMBER, emg2 NUMBER, emg3 NUMBER, emg4 NUMBER, emg5 NUMBER, emg6 NUMBER, emg7 NUMBER);
+
+CREATE TYPE Arm_Obj AS OBJECT
+(emg Emg_Obj, roll FLOAT, pitch FLOAT, heading FLOAT);
+
+CREATE TYPE ENTITY AS OBJECT
+(id NUMBER, loc Loc_Obj, hostility NUMBER, hit NUMBER) NOT FINAL;
+
+CREATE TYPE SHOOTER UNDER ENTITY
+(hr NUMBER, arm Arm_Obj, shot NUMBER, body Orient_Obj, head Orient_Obj) NOT FINAL;
+
+CREATE TYPE TARGET UNDER ENTITY
+(visible NUMBER);
+
+
+
+CREATE TABLE Target_Table
+(t_index NUMBER NOT NULL, t_date TIMESTAMP, t_target Target,
+CONSTRAINT target_PK PRIMARY KEY(t_index));
+
+CREATE SEQUENCE target_index_seq
+  START WITH 1
+  INCREMENT BY 1;
+
+
+
+CREATE TABLE Shooter_Table
+(s_index NUMBER NOT NULL, s_date TIMESTAMP, s_shooter SHOOTER,
+CONSTRAINT shooter_PK PRIMARY KEY(s_index));
+
+CREATE SEQUENCE shooter_index_seq
+  START WITH 1
+  INCREMENT BY 1;
