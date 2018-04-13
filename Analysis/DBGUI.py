@@ -155,25 +155,25 @@ class Slider():
 
 		# dynamic graphics - button surface #
 		self.button_surf = pygame.surface.Surface((20, 20))
-		self.button_surf.fill(TRANS)
-		self.button_surf.set_colorkey(TRANS)
-		pygame.draw.circle(self.button_surf, BLACK, (10, 10), 15, 0)
-		pygame.draw.circle(self.button_surf, ORANGE, (10, 10), 13, 0)
+		# self.button_surf.fill(TRANS)
+		# self.button_surf.set_colorkey(TRANS)
+		# pygame.draw.rect(self.button_surf, BLACK, (10, 10,20,20))
+		pygame.draw.rect(self.button_surf, ORANGE, (0, 0,20,20))
 
 		# static
-		surf = self.surf.copy()
-		pygame.draw.rect(surf, GREY, [0, 0, 520, 50], 3)
-		pygame.draw.rect(surf, ORANGE, [10, 10, 500, 10], 0)
-		pygame.draw.rect(surf, WHITE, [10, 30, 500, 5], 0)
+		# surf = self.surf.copy()
+		pygame.draw.rect(self.surf, GREY, [0, 0, 520, 50], 3)
+		pygame.draw.rect(self.surf, ORANGE, [10, 10, 500, 10], 0)
+		pygame.draw.rect(self.surf, WHITE, [10, 30, 500, 5], 0)
 
 		# dynamic
 		xpos = (10+int((self.val-self.xmin)/(self.xmax-self.xmin)*500), 33)
 		self.button_rect = self.button_surf.get_rect(center=xpos)
-		surf.blit(self.button_surf, self.button_rect)
-		self.button_rect.move_ip(self.xpos, self.ypos)  # move of button box to correct screen position
+		self.surf.blit(self.button_surf, self.button_rect)
+		# self.button_rect.move_ip(self.xpos, self.ypos)  # move of button box to correct screen position
 
 		# screen
-		self.surf.blit(surf, (self.xpos, self.ypos))
+		# self.surf.blit(self.surf, (self.xpos, self.ypos))
 
 	def move(self):
 		self.val = int((pygame.mouse.get_pos()[0] - self.xpos - 10) / 500 * (self.xmax - self.xmin) + self.xmin)
@@ -259,7 +259,7 @@ def guiMain(display_Surface,clock,T):
 
 
 	# # # Slider Initialization # # #
-	slider = Slider(display_Surface, "Slider", 0, 0, T.getLength()-1, 0, 0)
+	slider = Slider(display_Surface, "Slider", 0, 0, T.getLength()-1, 0, 300)
 
 	# # # Initialization Section # # #
 
@@ -297,11 +297,17 @@ def guiMain(display_Surface,clock,T):
 					running = False
 					sys.exit(0)
 				elif event.type == pygame.MOUSEBUTTONDOWN:
+					# Get the mouse position
 					pos = pygame.mouse.get_pos()
+
+					# Check for clicks on the slider button
 					if slider.button_rect.collidepoint(pos):
+						# Set flags to slider mode
 						slider.hit = True
 						startScrubLoop = True
 					else:
+						# Start the loop over if (we are in slider mode) && (the slider has reached the end),
+						# when the user clicks anywhere on the screen
 						if(startScrubLoop and (iterator >= T.getLength() - 1)):
 							iterator = 0
 						startScrubLoop = not startScrubLoop
@@ -352,7 +358,13 @@ def guiMain(display_Surface,clock,T):
 
 				# Converts the location X and Y at the current record to the scaled location
 				# of X and Y that fit the tracer window
-				x,y = tracer.convert_point_To_fit(T.getX(iteratorPast),T.getY(iteratorPast))
+				pastX = T.getX(iteratorPast)
+				pastY = T.getY(iteratorPast)
+
+				if(pastX is None or math.isnan(pastX)):
+					print("ajsfhdkjasfasfjkafhdkasjdf")
+
+				x,y = tracer.convert_point_To_fit(pastX, pastY)
 				if (T.getID(iterator) <= 200):
 					# Sets the scaled location of the user to 'newPoint'
 					newPoint = Coordinate(x, y)
@@ -382,14 +394,24 @@ def guiMain(display_Surface,clock,T):
 			DisplayArmOrient(display_Surface, arm_orientNew)
 			# Call to display the tracer window ( surface to draw on, tracer object, heading, target visible variable,
 			# target location Coordinate, target Symbol, location symbol)
-			DisplayTracer(display_Surface,tracer,T.getHeadHeading(iterator),targetVisible, targetLocation, targetSymbol,locSymbol)
+
+			fHeading = T.getHeadHeading(iterator)
+			istepback = 1
+			while(fHeading is None or math.isnan(fHeading)):
+				fHeading = T.getHeadHeading(iterator-istepback)
+				istepback = istepback + 1
+
+			DisplayTracer(display_Surface,tracer,fHeading,targetVisible, targetLocation, targetSymbol,locSymbol)
 			# Call to display the stats of the user ( surface to draw on, shot count, hit count, average reaction speed,
 			# distance traveled, score)
 			distance=T.getDistanceBeforeRowByUser(iterator,1)
 			DisplayStats(display_Surface, shotCount, hitCount, missCount, avgReact, distance, score)
 
+			# Check if the slider button has been pressed
 			if slider.hit:
+				# Position the slider according to the user's mouse position
 				slider.move()
+			# Use Pygame to draw updated position
 			slider.draw()
 
 			# Update the pygame display
@@ -401,73 +423,73 @@ def guiMain(display_Surface,clock,T):
 			print(err)
 			break
 
-def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, T,
-				visibleMarker, shotCount, iterator):
-		# # # Target Handling Section # # #
-	# Checks if the ID of the record is greater than 100 which indicates a target
-	x=T.getX(iterator)
-	y=T.getY(iterator)
-	targetVisible = 0
-	if(T.getID(iterator) > 100):
-		if(T.getTargetVisible(iterator) == 1):
-			# Sets the 'visibleMarker' variable to the time stamp of the record
-			visibleMarker = T.getDate(iterator)
-			targetVisible = 1
-			# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
-			targetLocation = Coordinate(x, y)
-
-		# Checks if the targets reports that it was hit
-		elif(T.getHit(iterator) == 1):
-			# Sets the 'targetVisible' variable to False
-			targetVisible = 0
-			# sets 'reaction' to the current reaction speed of the shooter to hit the target
-			reaction = T.getDate(iterator) - visibleMarker
-			# Adds the new reaction to the list of reactions
-			reactionList.append(to_float(reaction))
-			# Sets the 'reactionSum' variable to 0 to clear it.
-			reactionSum = 0
-
-		# # # User Handling Section # # #
-	else:
-		# Sets the scaled location of the user to 'newPoint'
-		newPoint = Coordinate(x, y)
-		# Adds the new point to the tracer array within the tracer object
-		tracer.add_tracer(newPoint)
-		# Checks if the user fired a shot
-		# if T.getShot(iterator) != current[5]:
-		#     print("Error with shot", current[5], " vs ",T.getShot(iterator))
-		# hitCount=T.getHitsBeforeRowByUser(iterator,1)
-		# if(T.getShot(iterator) == 1):
-		# 	# Adds one to the 'shotCount' variable
-		# 	shotCount = shotCount + 1
-        #
-		# 	#This section checks the next few records to find if the user hit or missed the target
-		# 	checkHitMissIterator = iterator-1
-		# 	while checkHitMissIterator < iterator + 3:
-		# 		# nextRecords = data_array[checkHitMissIterator]
-		# 		nextRecords = T.getHit(checkHitMissIterator)
-		# 		# if (T.getHit(checkHitMissIterator) != 0 and nextRecords[6]==None):
-		# 		#     print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
-		# 		if iterator == 75:
-		# 			print("Hitcount")
-		# 		if(T.getHit(checkHitMissIterator) == 1):
-		# 			hitCount += 1
-		# 			break
-		# 		elif (checkHitMissIterator == iterator + 2):
-		# 			missCount += 1
-		# 		checkHitMissIterator +=1
-        #
-		# Sets the emg values
-		# emg = current[9:17]
-		# if T.getEmgArray(iterator) != emg:
-		#     print("emg Error",emg, 'T=', T.getEmgArray(iterator))
-		# emg = T.getEmgArray(iterator)
-		# Sets the arm orientation values
-		# arm_orient = current[17:20]   #was 18:20 but that fails the test below by bringing in only the first 2 elements of Arm
-		# arm_orientNew= T.getArmArray(iterator)
-		# if arm_orientNew != arm_orient:
-		#      print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
-	return (tracer, reactionList, targetLocation, targetVisible, visibleMarker, shotCount, iterator)
+# def ComputeLoop(tracer, reactionList, targetLocation, targetVisible, T,
+# 				visibleMarker, shotCount, iterator):
+# 		# # # Target Handling Section # # #
+# 	# Checks if the ID of the record is greater than 100 which indicates a target
+# 	x=T.getX(iterator)
+# 	y=T.getY(iterator)
+# 	targetVisible = 0
+# 	if(T.getID(iterator) > 100):
+# 		if(T.getTargetVisible(iterator) == 1):
+# 			# Sets the 'visibleMarker' variable to the time stamp of the record
+# 			visibleMarker = T.getDate(iterator)
+# 			targetVisible = 1
+# 			# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
+# 			targetLocation = Coordinate(x, y)
+#
+# 		# Checks if the targets reports that it was hit
+# 		elif(T.getHit(iterator) == 1):
+# 			# Sets the 'targetVisible' variable to False
+# 			targetVisible = 0
+# 			# sets 'reaction' to the current reaction speed of the shooter to hit the target
+# 			reaction = T.getDate(iterator) - visibleMarker
+# 			# Adds the new reaction to the list of reactions
+# 			reactionList.append(to_float(reaction))
+# 			# Sets the 'reactionSum' variable to 0 to clear it.
+# 			reactionSum = 0
+#
+# 		# # # User Handling Section # # #
+# 	else:
+# 		# Sets the scaled location of the user to 'newPoint'
+# 		newPoint = Coordinate(x, y)
+# 		# Adds the new point to the tracer array within the tracer object
+# 		tracer.add_tracer(newPoint)
+# 		# Checks if the user fired a shot
+# 		# if T.getShot(iterator) != current[5]:
+# 		#     print("Error with shot", current[5], " vs ",T.getShot(iterator))
+# 		# hitCount=T.getHitsBeforeRowByUser(iterator,1)
+# 		# if(T.getShot(iterator) == 1):
+# 		# 	# Adds one to the 'shotCount' variable
+# 		# 	shotCount = shotCount + 1
+#         #
+# 		# 	#This section checks the next few records to find if the user hit or missed the target
+# 		# 	checkHitMissIterator = iterator-1
+# 		# 	while checkHitMissIterator < iterator + 3:
+# 		# 		# nextRecords = data_array[checkHitMissIterator]
+# 		# 		nextRecords = T.getHit(checkHitMissIterator)
+# 		# 		# if (T.getHit(checkHitMissIterator) != 0 and nextRecords[6]==None):
+# 		# 		#     print("Error with Hit", nextRecords[6], " vs ",T.getHit(iterator), " hitCount=",hitCount, " missCount=", missCount)
+# 		# 		if iterator == 75:
+# 		# 			print("Hitcount")
+# 		# 		if(T.getHit(checkHitMissIterator) == 1):
+# 		# 			hitCount += 1
+# 		# 			break
+# 		# 		elif (checkHitMissIterator == iterator + 2):
+# 		# 			missCount += 1
+# 		# 		checkHitMissIterator +=1
+#         #
+# 		# Sets the emg values
+# 		# emg = current[9:17]
+# 		# if T.getEmgArray(iterator) != emg:
+# 		#     print("emg Error",emg, 'T=', T.getEmgArray(iterator))
+# 		# emg = T.getEmgArray(iterator)
+# 		# Sets the arm orientation values
+# 		# arm_orient = current[17:20]   #was 18:20 but that fails the test below by bringing in only the first 2 elements of Arm
+# 		# arm_orientNew= T.getArmArray(iterator)
+# 		# if arm_orientNew != arm_orient:
+# 		#      print("arm_orient Error",arm_orient, 'T=', arm_orientNew)
+# 	return (tracer, reactionList, targetLocation, targetVisible, visibleMarker, shotCount, iterator)
 
 # takes a date time and converts it to a float
 def to_float(dt_time):
@@ -478,8 +500,25 @@ def orientation(originalSymbol, heading):
 	facing = pygame.transform.rotate(originalSymbol, heading)
 	return facing
 
+# resets array entries to 0 if None or Nan
+def resetBadData(array, expectedLength):
+	# Return array of zeros if nonexistant
+	if(array is None):
+		return [0]*expectedLength
+
+	# Reset individual items to 0 if they are None or NaN
+	index = 0
+	while(index < expectedLength):
+		if(array[index] is None or math.isnan(array[index])):
+			print("WARNING [resetBadData]: data point has missing entries")
+			array[index] = 0
+		index = index + 1
+
+
 # Draws EMG information to the window
 def DisplayEMG(display_Surface,newEMG):
+	resetBadData(newEMG,8)
+
 	# Values to position and format the components
 	startingRow = banner_height+50
 	spacing_off_tracer = 80
@@ -498,28 +537,28 @@ def DisplayEMG(display_Surface,newEMG):
 
 	# Formats and locates the emg text
 	font = pygame.font.Font(None, font_size)
-	emg1 = font.render('EMG 1 - ' + str(newEMG[0]), 1, emg_color)
+	emg1 = font.render('EMG 1: ' + str(newEMG[0]), 1, emg_color)
 	emg1pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow))
 
-	emg2 = font.render('EMG 2 - ' + str(newEMG[1]), 1, emg_color)
+	emg2 = font.render('EMG 2: ' + str(newEMG[1]), 1, emg_color)
 	emg2pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer + horizontal_spacing, startingRow))
 
-	emg3 = font.render('EMG 3 - ' + str(newEMG[2]), 1, emg_color)
+	emg3 = font.render('EMG 3: ' + str(newEMG[2]), 1, emg_color)
 	emg3pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer, (startingRow+(verticle_spacing*1))))
 
-	emg4 = font.render('EMG 4 - ' + str(newEMG[3]), 1, emg_color)
+	emg4 = font.render('EMG 4: ' + str(newEMG[3]), 1, emg_color)
 	emg4pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer + horizontal_spacing, (startingRow+(verticle_spacing*1))))
 
-	emg5 = font.render('EMG 5 - ' + str(newEMG[4]), 1, emg_color)
+	emg5 = font.render('EMG 5: ' + str(newEMG[4]), 1, emg_color)
 	emg5pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing*2)))
 
-	emg6 = font.render('EMG 6 - ' + str(newEMG[5]), 1, emg_color)
+	emg6 = font.render('EMG 6: ' + str(newEMG[5]), 1, emg_color)
 	emg6pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer + horizontal_spacing, startingRow+(verticle_spacing*2)))
 
-	emg7 = font.render('EMG 7 - ' + str(newEMG[6]), 1, emg_color)
+	emg7 = font.render('EMG 7: ' + str(newEMG[6]), 1, emg_color)
 	emg7pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing*3)))
 
-	emg8 = font.render('EMG 8 - ' + str(newEMG[7]), 1, emg_color)
+	emg8 = font.render('EMG 8: ' + str(newEMG[7]), 1, emg_color)
 	emg8pos = emg1.get_rect(topleft=(tracer_width+spacing_off_tracer + horizontal_spacing, startingRow+(verticle_spacing*3)))
 
 	# Draws the header and emg text to the window
@@ -535,6 +574,8 @@ def DisplayEMG(display_Surface,newEMG):
 
 # Draws the Arm Orientation to the window
 def DisplayArmOrient(display_Surface,newArm):
+	resetBadData(newArm,3)
+
 	# Values to position and format the components
 	startingRow = banner_height+50
 	spacing_off_tracer = 400
@@ -545,13 +586,13 @@ def DisplayArmOrient(display_Surface,newArm):
 
 	# Formats and locates the orientation text
 	font = pygame.font.Font(None, font_size)
-	arm1 = font.render('Arm Roll - ' + str(newArm[0]), 1, arm_color)
+	arm1 = font.render('Arm Roll: ' + str(newArm[0]), 1, arm_color)
 	arm1pos = arm1.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow))
 
-	arm2 = font.render('Arm Pitch - ' + str(newArm[1]), 1, arm_color)
+	arm2 = font.render('Arm Pitch: ' + str(newArm[1]), 1, arm_color)
 	arm2pos = arm2.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow + verticle_spacing))
 
-	arm3 = font.render('Arm Yaw - ' + str(newArm[2]), 1, arm_color)
+	arm3 = font.render('Arm Yaw: ' + str(newArm[2]), 1, arm_color)
 	arm3pos = arm3.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow + verticle_spacing*2))
 
 	# Draws the orientation text to the window
@@ -561,7 +602,7 @@ def DisplayArmOrient(display_Surface,newArm):
 
 # Averages a list of Coordinates
 def averageTracer(list):
-	if(len(list) < 2):
+	if(len(list) <= 2):
 		newList = [list[0]]
 		return newList
 	else:
@@ -659,22 +700,22 @@ def DisplayStats(display_Surface, shotCount, hits, misses, avgReact, distance, s
 
 	# Formats and locates the stat text
 	font = pygame.font.Font(None, font_size)
-	shot = font.render('Shot Count - ' + str(shotCount), 1, Stat_color)
+	shot = font.render('Shot Count: ' + str(shotCount), 1, Stat_color)
 	shotpos = shot.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow))
 
-	hits = font.render('Hit Count - ' + str(hits), 1, Stat_color)
+	hits = font.render('Hit Count: ' + str(hits), 1, Stat_color)
 	hitspos = shot.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing)))
 
-	misses = font.render('Miss Count - ' + str(misses), 1, Stat_color)
+	misses = font.render('Miss Count: ' + str(misses), 1, Stat_color)
 	missespos = shot.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing*2)))
 
-	avgReact = font.render('Average Reaction Speed - ' + str(avgReact), 1, Stat_color)
+	avgReact = font.render('Average Reaction Speed: ' + str(avgReact), 1, Stat_color)
 	avgReactpos = shot.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing*3)))
 
-	distance = font.render('Distance traveled - ' + str(distance), 1, Stat_color)
+	distance = font.render('Distance traveled: ' + str(distance), 1, Stat_color)
 	distancepos = shot.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing*4)))
 
-	score = font.render('Score - ' + str(score), 1, Stat_color)
+	score = font.render('Score: ' + str(score), 1, Stat_color)
 	scorepos = shot.get_rect(topleft=(tracer_width+spacing_off_tracer, startingRow+(verticle_spacing*5)))
 
 	# Draws the stats to the window
