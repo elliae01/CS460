@@ -88,7 +88,7 @@ class Targalytics:
         self.df.rename(columns={0: "INDEX", 1: "Date", 2: "Id", 3: "Loc.x", 4: "Loc.y", 5: "Loc.z", 6: "Hostility",
                 7: "Hit", 8: "Heart Rate", 9: "Emg0", 10: "Emg1", 11: "Emg2", 12: "Emg3", 13: "Emg4", 14: "Emg5",
                 15: "Emg6", 16: "Emg7", 17: "Arm.Roll", 18: "Arm.Pitch", 19: "Arm.Heading", 20: "Shot",
-                21: "Hody.Heading", 22: "Body.Roll", 23: "Body.Pitch", 24: "Head.Heading", 25: "Head.Roll",
+                21: "Body.Heading", 22: "Body.Roll", 23: "Body.Pitch", 24: "Head.Heading", 25: "Head.Roll",
                 26: "Head.Pitch"}, inplace=True)
         dfCurrentEvent = (self.df['Date'] >= StartDate) & (self.df['Date'] <= EndDate)
         self.df=self.df[dfCurrentEvent]
