@@ -147,8 +147,8 @@ def Test3():
     print("Max Y",testEvent3.getMaxY())
     print("Min Y",testEvent3.getMinY())
     print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
-    # dfReactionEvents=testEvent3.getReactionEvents()
-    # print(dfReactionEvents)
+    dfReactionEvents=testEvent3.getReactionEvents()
+    print(dfReactionEvents)
     AveReactionTime, HitCount, Miss, HitMissRatio, ShotCount, score = testEvent3.listReactionTimesUpToRow(190,1)
     # print("1st = ",dReactionEventTimes[1])
     # for key in dReactionEventTimes:
