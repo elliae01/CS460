@@ -146,7 +146,6 @@ def Test3():
     print("Min X",testEvent3.getMinX())
     print("Max Y",testEvent3.getMaxY())
     print("Min Y",testEvent3.getMinY())
-    print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
     dfReactionEvents=testEvent3.getReactionEvents()
     print(dfReactionEvents)
     AveReactionTime, HitCount, Miss, HitMissRatio, ShotCount, score = testEvent3.listReactionTimesUpToRow(190,1)
@@ -163,6 +162,15 @@ def Test3():
     print("Number of Shots = ", ShotCount, ", Hits=", HitCount, ", Misses=", Miss)
     print("Hit/Miss Ratio=", HitMissRatio)
     print("Average Reaction Time=", AveReactionTime, " seconds.")
+    print('Distance traveld to row 100 = ', testEvent3.getDistanceBeforeRowByUser(100,1))
+    print('Distance traveld to row 2 = ', testEvent3.getDistanceBeforeRowByUser(2,1))
+    print('Distance traveld to row 3 = ', testEvent3.getDistanceBeforeRowByUser(3,1))
+    print('Distance traveld to row 47 = ', testEvent3.getDistanceBeforeRowByUser(47,1))
+    print('Distance traveld to row 48 = ', testEvent3.getDistanceBeforeRowByUser(48,1))
+    print('Distance traveld to row 49 = ', testEvent3.getDistanceBeforeRowByUser(49,1))
+    print('Distance traveld to row 51 = ', testEvent3.getDistanceBeforeRowByUser(51,1))
+    TotalDistanceUser1=testEvent3.TotalDistanceTraveled(1)
+    print('Distance traveled = ', TotalDistanceUser1)
 
 if __name__ == '__main__':
     ip = 'localhost'

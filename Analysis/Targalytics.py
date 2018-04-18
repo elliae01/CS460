@@ -267,12 +267,23 @@ class Targalytics:
         return self.df.shape[1]
 
     def distanceFromLastPoint(self,row):
+        CurrentUser=self.getID(row)
+        RolledBackRow=row-1
         d=0
-        #print("row=",row)
-        if row>0:
-            xi = self.getX(row-1)
+        if CurrentUser > 100:
+            return 0
+        if row>0 and CurrentUser<100:
+            CheckUser = self.getID(RolledBackRow)
+            if CheckUser!=CurrentUser:
+                while (RolledBackRow>=0 and CheckUser!=CurrentUser):
+                    # print(row, RolledBackRow,CurrentUser, CheckUser, "rolling back")
+                    RolledBackRow=RolledBackRow-1
+                    CheckUser=self.getID(RolledBackRow)
+                if RolledBackRow<0 or CheckUser!=CurrentUser:
+                    return 0
+            xi = self.getX(RolledBackRow)
             xii = self.getX(row)
-            yi = self.getY(row-1)
+            yi = self.getY(RolledBackRow)
             yii = self.getY(row)
             sq1 = (xii-xi)*(xii-xi)
             sq2 = (yii-yi)*(yii-yi)
@@ -293,15 +304,10 @@ class Targalytics:
         NotFirst=False
         count=self.rowCount()
         diff=finishdate-startdate
-        #print("Count = ",count)
-        #print("StartDate=", startdate, " --  Finish Date=", finishdate, " --> Elasped Time=",diff)
         d=0.0
         for i in range(count):
             if self.getID(i)==user:
-                # print(self.getDate(i),startdate)
-                #print("---",i)
                 if (self.getDate(i)>=startdate) and (self.getDate(i)<=finishdate):
-                    #print(self.getINDEX(i),self.getX(i),self.getY(i))
                     if NotFirst:
                         x1 = self.getX(i-1)
                         y1 = self.getY(i-1)
