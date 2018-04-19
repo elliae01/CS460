@@ -93,7 +93,7 @@ class Targalytics:
         dfCurrentEvent = (self.df['Date'] >= StartDate) & (self.df['Date'] <= EndDate)
         self.df=self.df[dfCurrentEvent]
         database.close
-        return None
+        # return None	# Commented...seems to have no use!
 
     @classmethod
     def NewFromDF(self,df2):
@@ -146,6 +146,13 @@ class Targalytics:
     def printHeadDF(self):
         print(self.df.head())
         return None
+
+    def isBadDateSelection(self):
+        if(math.isnan(self.df['Loc.x'].max())):
+            # Location column for this date has a problem
+            return True
+        else:
+            return False
 
     def getRawDF(self):
         return self.df
@@ -422,16 +429,32 @@ class Targalytics:
         return 0
 
     def getMaxX(self):
-        return self.df['Loc.x'].max()
+        if(self.df.empty):
+            print("WARNING [getMaxX]: Dataframe empty!")
+            return 10
+        else:
+            return self.df['Loc.x'].max()
 
     def getMaxY(self):
-        return self.df['Loc.y'].max()
+        if(self.df.empty):
+            print("WARNING [getMaxY]: Dataframe empty!")
+            return 10
+        else:
+            return self.df['Loc.y'].max()
 
     def getMinX(self):
-        return self.df['Loc.x'].min()
+        if(self.df.empty):
+            print("WARNING [getMinX]: Dataframe empty!")
+            return -10
+        else:
+            return self.df['Loc.x'].min()
 
     def getMinY(self):
-        return self.df['Loc.y'].min()
+        if(self.df.empty):
+            print("WARNING [getMinY]: Dataframe empty!")
+            return -10
+        else:
+            return self.df['Loc.y'].min()
 
     def getTargetLocationByID(self,user):
         dfCurrentEvent = (self.df['Id'] == user)
@@ -630,7 +653,7 @@ class Targalytics:
             # print("Hit/Miss Ratio=",HitMissRatio)
         # print("Length of list=",len(self.aReactionTimes))
         # print("Average Reaction Time=",AveReactionTime, " seconds.")
-        score =0 
+        score =0
         if AveReactionTime>0:
             score = HitMissRatio*(1000/AveReactionTime)
         return AveReactionTime, HitCount, Miss, HitMissRatio, ShotCount,score
