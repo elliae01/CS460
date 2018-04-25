@@ -473,31 +473,30 @@ class Targalytics:
 
         return -1
 
-    def getSessions(self):
+    # Returns a list of sessions seperated by
+    def getSessions(self, sessionGapMinutes):
         result = []
         index = 1
         cnt = 0
         avg = Timedelta(0,unit="m")
+        savedStart = self.getDate(0)
+        print(type(savedStart))
+        # savedEnd = self.getDate(0)
         while(index < self.rowCount()):
             prevDateTime = self.getDate(index - 1)
             currDateTime = self.getDate(index)
 
-            # print(currDateTime - prevDateTime)
-            # print("What: ",Timedelta(2,unit="m"))
-
-            if((currDateTime - prevDateTime) > Timedelta(2,unit="m")):
-                # print("prev: ",prevDateTime)
-                # print("curr: ",currDateTime)
-                print("Result: ",currDateTime - prevDateTime)
+            if((currDateTime - prevDateTime) > Timedelta(sessionGapMinutes,unit="m")):
+                timeGap = currDateTime - prevDateTime
+                print("Gap: ",timeGap)
+                # start datetime, end datetime
+                result.append([str(savedStart), str(prevDateTime)])
+                savedStart = currDateTime
                 cnt += 1
                 avg += currDateTime - prevDateTime
-
-
-# if((currDateTime - prevDateTime) < Timedelta()):
-
-            # result.append([])
             index += 1
         # print("AVG: ",avg/cnt)
+        return result
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):
 

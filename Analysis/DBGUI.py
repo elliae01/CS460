@@ -3,7 +3,6 @@ import sys
 import time
 import random
 import math
-import timestring
 import cx_Oracle
 import pandas as pd
 from Targalytics import *
@@ -93,18 +92,23 @@ class Tracer:
 			maxX = 10
 			minY = -10
 			maxY = 10
-
-		self.minX = minX
-		self.minY = minY
-		if (minX > 0):
-			self.scaleX = self.width / (abs(maxX) - abs(minX))
+			self.scaleX = 1
+			self.scaleY = 1
 		else:
-			self.scaleX = self.width / (abs(maxX) + abs(minX))
+			try:
+				self.minX = minX
+				self.minY = minY
+				if (minX > 0 and not math.isnan(abs(maxX) - abs(minX))):
+					self.scaleX = self.width / (abs(maxX) - abs(minX))
+				else:
+					self.scaleX = self.width / (abs(maxX) + abs(minX))
 
-		if (minY > 0):
-			self.scaleY = self.height / (abs(maxY) - abs(minY))
-		else:
-			self.scaleY = self.height / (abs(maxY) + abs(minY))
+				if (minY > 0 and not math.isnan(abs(maxY) - abs(minY))):
+					self.scaleY = self.height / (abs(maxY) - abs(minY))
+				else:
+					self.scaleY = self.height / (abs(maxY) + abs(minY))
+			except:
+				print("'ERROR [find_scale_factors]: couldn't set scale factors")
 
 	def convert_point_To_fit(self, x, y):
 		newX = ((x - self.minX) * self.scaleX)
@@ -395,7 +399,7 @@ def guiMain(display_Surface, clock, T):
 					visibleMarker = T.getDate(iterator)
 					targetVisible = 1
 					# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
-					targetLocation = Coordinate(T.getX(iterator), T.getY(iterator))
+					targetLocation = Coordinate((-1)*T.getX(iterator), T.getY(iterator))
 				if (T.getTargetVisible(iterator) == 0):
 					targetVisible = 0
 
@@ -647,7 +651,8 @@ def DisplayTracer(display_Surface, tracer, heading, targetVisible, targetLocatio
 	if (targetVisible == 1):
 		# Places the symbol of the target
 		# print("Place Symbol",targetLocation.getX(),targetLocation.getY())
-		placeSymbol(display_Surface, targetSymbol, targetLocation.getX() - 100, targetLocation.getY() + 180)
+		placeSymbol(display_Surface, targetSymbol, targetLocation.getX() - 100, targetLocation.getY() + 180)	#old version
+		# placeSymbol(display_Surface, targetSymbol, targetLocation.getX() - 350, targetLocation.getY() + 300)
 
 
 # Draws the stats to the window
@@ -849,8 +854,7 @@ def endHandler(display_Surface, clock):
 				display_Surface.blit(exit, exitpos)
 				pygame.display.update()
 
-
-def DBGUI_main(startDateTime, endDateTime):
+def DBGUI_init(startDateTime, endDateTime):
 	ip = 'localhost'
 	port = 1521
 	SID = 'orcl'
@@ -870,7 +874,9 @@ def DBGUI_main(startDateTime, endDateTime):
 	# StartDate = pd.to_datetime('2018-04-13 17:07:56.164')
 	# EndDate = pd.to_datetime('2018-04-13 17:45:12.000')
 
-	T = Targalytics(DatabaseInfo, StartDate, EndDate)
+	return Targalytics(DatabaseInfo, StartDate, EndDate)
+
+def DBGUI_main(T):
 	T.ExportToCSV('Kyles Demo')
 
 	if(T.isBadDateSelection()):
@@ -881,5 +887,5 @@ def DBGUI_main(startDateTime, endDateTime):
 
 
 if __name__ == '__main__':
-	DBGUI_main('2018-03-17 16:07:56.164', '2018-03-17 16:59:12.000')
+	DBGUI_main(DBGUI_init('2018-03-17 16:07:56.164', '2018-03-17 16:59:12.000'))
 	# "yyyy-MM-dd hh:mm:ss.zzz"
