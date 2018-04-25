@@ -1,4 +1,4 @@
-from pandas import DataFrame
+from pandas import DataFrame, Timedelta
 import cx_Oracle
 import os
 import math
@@ -170,7 +170,7 @@ class Targalytics:
 
     def getX(self, row):
         #print("Calculating X for index "+str(self.df.iat[row, self.cCol4INDEX]))
-        return self.df.iat[row, self.cCol4LocX]
+        return (self.df.iat[row, self.cCol4LocX]) * (-1)
 
     def getY(self, row):
         return self.df.iat[row, self.cCol4LocY]
@@ -433,7 +433,7 @@ class Targalytics:
             print("WARNING [getMaxX]: Dataframe empty!")
             return 10
         else:
-            return self.df['Loc.x'].max()
+            return (self.df['Loc.x'].min()) * (-1)
 
     def getMaxY(self):
         if(self.df.empty):
@@ -447,7 +447,7 @@ class Targalytics:
             print("WARNING [getMinX]: Dataframe empty!")
             return -10
         else:
-            return self.df['Loc.x'].min()
+            return (self.df['Loc.x'].max()) * (-1)
 
     def getMinY(self):
         if(self.df.empty):
@@ -472,6 +472,32 @@ class Targalytics:
         y=df.iat[0, self.cCol4LocY]
 
         return -1
+
+    def getSessions(self):
+        result = []
+        index = 1
+        cnt = 0
+        avg = Timedelta(0,unit="m")
+        while(index < self.rowCount()):
+            prevDateTime = self.getDate(index - 1)
+            currDateTime = self.getDate(index)
+
+            # print(currDateTime - prevDateTime)
+            # print("What: ",Timedelta(2,unit="m"))
+
+            if((currDateTime - prevDateTime) > Timedelta(2,unit="m")):
+                # print("prev: ",prevDateTime)
+                # print("curr: ",currDateTime)
+                print("Result: ",currDateTime - prevDateTime)
+                cnt += 1
+                avg += currDateTime - prevDateTime
+
+
+# if((currDateTime - prevDateTime) < Timedelta()):
+
+            # result.append([])
+            index += 1
+        # print("AVG: ",avg/cnt)
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):
 
