@@ -422,7 +422,7 @@ def guiMain(display_Surface, clock, T):
 			# Call to display the stats of the user ( surface to draw on, shot count, hit count, average reaction speed,
 			# distance traveled, score)
 			distance = T.getDistanceBeforeRowByUser(iterator, 1)
-			DisplayStats(display_Surface, shotCount, hitCount, missCount, avgReact, distance, score)
+			DisplayStats(display_Surface, shotCount, hitCount, missCount, avgReact, round(distance), round(score))
 			DisplayTime(display_Surface, T.getDate(iterator))
 
 			# Check if the slider button has been pressed
@@ -690,7 +690,7 @@ def DisplayStats(display_Surface, shotCount, hits, misses, avgReact, distance, s
 	avgReactpos = shot.get_rect(
 		topleft=(tglobals.tracer_width + spacing_off_tracer, startingRow + (verticle_spacing * 3)))
 
-	distance = font.render('Distance traveled: ' + str(distance), 1, Stat_color)
+	distance = font.render('Distance traveled: ' + str(distance) + " inches", 1, Stat_color)
 	distancepos = shot.get_rect(
 		topleft=(tglobals.tracer_width + spacing_off_tracer, startingRow + (verticle_spacing * 4)))
 

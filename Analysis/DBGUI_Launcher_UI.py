@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
         self.tableWidget_sessions.setObjectName(_fromUtf8("tableWidget_sessions"))
         self.tableWidget_sessions.setColumnCount(0)
         self.tableWidget_sessions.setRowCount(0)
-        self.tableWidget_sessions.horizontalHeader().setDefaultSectionSize(200)
+        self.tableWidget_sessions.horizontalHeader().setDefaultSectionSize(170)
         self.horizontalLayout_2.addWidget(self.tableWidget_sessions)
         self.tabWidget.addTab(self.tab_sessions, _fromUtf8(""))
         self.verticalLayout_2.addWidget(self.tabWidget)

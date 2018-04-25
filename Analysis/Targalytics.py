@@ -490,7 +490,7 @@ class Targalytics:
                 timeGap = currDateTime - prevDateTime
                 print("Gap: ",timeGap)
                 # start datetime, end datetime
-                result.append([str(savedStart), str(prevDateTime)])
+                result.append([str(savedStart), str(prevDateTime), str(round(self.DistanceTraveled(1, savedStart, prevDateTime)))])
                 savedStart = currDateTime
                 cnt += 1
                 avg += currDateTime - prevDateTime

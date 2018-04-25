@@ -39,9 +39,9 @@ class ChangedHandler:
 		self.ui.tabWidget.currentChanged.connect(self.tabSwitch)
 		print("Number of rows of Sessions is ",len(sessions))
 		self.ui.tableWidget_sessions.setRowCount(len(sessions))
-		self.ui.tableWidget_sessions.setColumnCount(2)
+		self.ui.tableWidget_sessions.setColumnCount(3)
 
-		self.ui.tableWidget_sessions.setHorizontalHeaderLabels("Start Time;End Time;".split(";"))
+		self.ui.tableWidget_sessions.setHorizontalHeaderLabels("Start Time;End Time;Distance (Inches)".split(";"))
 		# self.ui.tableWidget_sessions.setVerticalHeaderLabels("1;2;3;4".split(";"))
 
 		self.sessions = sessions
@@ -77,12 +77,13 @@ class ChangedHandler:
 
 		index = 0
 		while(index < len(arr)):
-			self.addRow(index, arr[index][0], arr[index][1])
+			self.addRow(index, arr[index][0], arr[index][1], arr[index][2])
 			index = index + 1
 
-	def addRow(self, index, col1, col2):
+	def addRow(self, index, col1, col2, col3):
 		self.ui.tableWidget_sessions.setItem(index,0, QtGui.QTableWidgetItem(col1))
 		self.ui.tableWidget_sessions.setItem(index,1, QtGui.QTableWidgetItem(col2))
+		self.ui.tableWidget_sessions.setItem(index,2, QtGui.QTableWidgetItem(col3))
 
 	def setDateFrom(self,dateChosen):
 		self.dateTimeFrom.setDate(dateChosen)
