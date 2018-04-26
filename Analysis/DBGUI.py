@@ -98,12 +98,13 @@ class Tracer:
 			try:
 				self.minX = minX
 				self.minY = minY
-				if (minX > 0 and not math.isnan(abs(maxX) - abs(minX))):
-					self.scaleX = self.width / (abs(maxX) - abs(minX))
+				if (minX > 0 and (abs(maxX) - abs(minX)) != 0 and not math.isnan(abs(maxX) - abs(minX))):
+					denom = (abs(maxX) - abs(minX))
+					self.scaleX = self.width / denom
 				else:
 					self.scaleX = self.width / (abs(maxX) + abs(minX))
 
-				if (minY > 0 and not math.isnan(abs(maxY) - abs(minY))):
+				if (minY > 0 and (abs(maxY) - abs(minY)) != 0 and not math.isnan(abs(maxY) - abs(minY))):
 					self.scaleY = self.height / (abs(maxY) - abs(minY))
 				else:
 					self.scaleY = self.height / (abs(maxY) + abs(minY))
@@ -176,6 +177,9 @@ class Slider():
 		# Position slider button
 		self.buttonSurf = pygame.surface.Surface((self.sliderButtonSize, self.sliderButtonSize))
 		self.buttonSurf.fill(tglobals.ORANGE)
+		if((self.xmax - self.xmin) == 0):
+			self.xmax = self.xmin + 5
+			print("WARNING [Slider:draw]: Bad scaling data fix attempted, xmax and xmin might be the same?")
 		buttonCenter = (self.xpos + self.sliderButtonWidthSpacer + int(
 			(self.val - self.xmin) / (self.xmax - self.xmin) * self.innerWidthScroll), self.ypos + self.outerHeight / 2)
 		self.buttonRect = self.buttonSurf.get_rect(center=buttonCenter)
