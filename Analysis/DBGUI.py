@@ -378,9 +378,6 @@ def guiMain(display_Surface, clock, T):
 				pastX = T.getX(iteratorPast)
 				pastY = T.getY(iteratorPast)
 
-				if (pastX is None or math.isnan(pastX)):
-					print("ajsfhdkjasfasfjkafhdkasjdf")
-
 				x, y = tracer.convert_point_To_fit(pastX, pastY)
 				if (T.getID(iterator) <= 200):
 					# Sets the scaled location of the user to 'newPoint'
@@ -393,15 +390,20 @@ def guiMain(display_Surface, clock, T):
 			# targetVisible=T.getTargetVisible(iterator)
 			# print(iterator, avgReact, hitCount, missCount, HitMissRatio, shotCount, score, targetVisible)
 
-			if (T.getID(iterator) > 100):
-				if (T.getTargetVisible(iterator) == 1):
-					# Sets the 'visibleMarker' variable to the time stamp of the record
-					visibleMarker = T.getDate(iterator)
-					targetVisible = 1
-					# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
-					targetLocation = Coordinate((-1)*T.getX(iterator), T.getY(iterator))
-				if (T.getTargetVisible(iterator) == 0):
+			tempVis = T.getTargetVisible(iterator)
+			if (tempVis == 1):
+				lastDisplayedTargetIndex = slider.val
+				# Sets the 'visibleMarker' variable to the time stamp of the record
+				visibleMarker = T.getDate(iterator)
+				targetVisible = 1
+				# Sets the target Location to the Coordinate object storing the X and Y location to draw the target
+				targetLocation = Coordinate((-1)*T.getX(iterator), T.getY(iterator))
+			# else, if target is not visible
+			elif (tempVis == 0):
+				# Check if it still should be visible
+				if((lastDisplayedTargetIndex is not None) and (abs(lastDisplayedTargetIndex - slider.val) > 50)):
 					targetVisible = 0
+					lastDisplayedTargetIndex = None
 
 			# Call to display the EMG Values ( surface to draw on, emg list)
 			emg = T.getEmgArray(iterator)
@@ -651,8 +653,10 @@ def DisplayTracer(display_Surface, tracer, heading, targetVisible, targetLocatio
 	if (targetVisible == 1):
 		# Places the symbol of the target
 		# print("Place Symbol",targetLocation.getX(),targetLocation.getY())
-		placeSymbol(display_Surface, targetSymbol, targetLocation.getX() - 100, targetLocation.getY() + 180)	#old version
-		# placeSymbol(display_Surface, targetSymbol, targetLocation.getX() - 350, targetLocation.getY() + 300)
+		# placeSymbol(display_Surface, targetSymbol, targetLocation.getX() - 100, targetLocation.getY() + 180)	#old version
+		# print("TARGET LOCAATION ", targetLocation.getX(), targetLocation.getY())
+		placeSymbol(display_Surface, targetSymbol, targetLocation.getX() + 350, targetLocation.getY()-300)
+		# placeSymbol(display_Surface, targetSymbol, 0,0)
 
 
 # Draws the stats to the window

@@ -473,29 +473,29 @@ class Targalytics:
 
         return -1
 
-    # Returns a list of sessions seperated by
+    # Returns a list of lists, each session separated by sessionGapMinutes. Uses Pandas Timedelta.
     def getSessions(self, sessionGapMinutes):
+        # List to return results
         result = []
+        # Start at index 1 so that prevDateTime gets index 0 date
         index = 1
-        cnt = 0
-        avg = Timedelta(0,unit="m")
+        # Init start date for first saved start date
         savedStart = self.getDate(0)
-        print(type(savedStart))
-        # savedEnd = self.getDate(0)
+        # There are different time libraries being used, uncomment below to see
+        # print(type(savedStart))
         while(index < self.rowCount()):
             prevDateTime = self.getDate(index - 1)
             currDateTime = self.getDate(index)
 
+            # If the current time and previous time have a gap of more than the "sessionGapMinutes",
+            # we need to append the session to the list of other sessions
             if((currDateTime - prevDateTime) > Timedelta(sessionGapMinutes,unit="m")):
-                timeGap = currDateTime - prevDateTime
-                print("Gap: ",timeGap)
-                # start datetime, end datetime
+                # start datetime, end datetime, distance
                 result.append([str(savedStart), str(prevDateTime), str(round(self.DistanceTraveled(1, savedStart, prevDateTime)))])
+
+                # save current time as the start, for the next session
                 savedStart = currDateTime
-                cnt += 1
-                avg += currDateTime - prevDateTime
             index += 1
-        # print("AVG: ",avg/cnt)
         return result
 
     def getAvgReactionTimeBeforeRowByUser(self, row, user):

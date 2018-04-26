@@ -64,6 +64,8 @@ class ChangedHandler:
 		# set interval to the minimum length in past from current time
 		self.dateTimeFrom = self.dateTimeTo.addSecs(-self.minDiffSeconds)
 
+		self.loadDefaultTimes()
+
 		# # # Sync GUI # # #
 
 		self.ui.calendarWidget_from.setSelectedDate(self.dateTimeFrom.date())
@@ -71,6 +73,8 @@ class ChangedHandler:
 
 		self.ui.calendarWidget_to.setSelectedDate(self.dateTimeTo.date())
 		self.ui.timeEdit_to.setTime(self.dateTimeTo.time())
+
+		self.updateMessageDate()
 
 	def fillRows(self, arr):
 		print("Array: ",arr)
@@ -97,26 +101,14 @@ class ChangedHandler:
 		self.dateTimeTo.setDate(dateChosen)
 		self.updateMessageDate()
 
+	def setTimeTo(self, timeChosen):
+		self.dateTimeTo.setTime(timeChosen)
+		self.updateMessageDate()
+
 	# Listens for switching of tabs
 	def tabSwitch(self, val):
 		print("Tab was changed to: ", val)
 		self.currentTab = val
-		self.tabSyncVars()
-
-	def tabSyncVars(self):
-		if(self.currentTab == 0):
-			# self.setDateFrom()
-			# self.setTimeFrom()
-			pass
-		elif(self.currentTab == 1):
-			pass
-			# self.ui.tableWidget_sessions
-		else:
-			print("ERROR [ChangedHandler:tabSyncVars]: Something went wrong syncing tabs")
-
-	def setTimeTo(self, timeChosen):
-		self.dateTimeTo.setTime(timeChosen)
-		self.updateMessageDate()
 
 	def sessionHandler(self, val):
 		# QtCore.QModelIndex.column()
@@ -155,11 +147,36 @@ class ChangedHandler:
 	def setMessage(self, text):
 		self.ui.label_output.setText(text)
 
+	# Updates the messages shown to user after date is chosen
 	def updateMessageDate(self):
 		self.setMessage("From <b>{}</b> to <b>{}</b>".format(self.dateTimeFrom.toString(self.dateTimeFormat), self.dateTimeTo.toString(self.dateTimeFormat)))
 
-	def checkDates(self):
-		pass
+	def saveDefaultTimes(self):
+		# if(self.savedStartDate is None or self.savedEndDate is None):
+		# 	self.savedStartDate
+		# 	pass
+		try:
+			file = open('Times.txt', 'w')
+			file.writelines(str(self.dateTimeFrom.toString(self.dateTimeFormatServer)))
+			file.writelines("\n")
+			file.writelines(str(self.dateTimeTo.toString(self.dateTimeFormatServer)))
+			file.close()
+		except:
+			print("INFO [ChangedHandler:saveDefaultTimes]: Could not save default times file")
+
+	def loadDefaultTimes(self):
+		try:
+			file = open('Times.txt', 'r')
+			temp1 = file.readline().strip()
+			temp2 = file.readline().strip()
+			# print("from",temp1)
+			# print("to",temp2)
+			self.dateTimeFrom = QtCore.QDateTime.fromString(temp1, self.dateTimeFormatServer)
+			self.dateTimeTo = QtCore.QDateTime.fromString(temp2, self.dateTimeFormatServer)
+			# print("from {} to {}".format(self.dateTimeFrom, self.dateTimeTo))
+			file.close()
+		except:
+			print("INFO [ChangedHandler:loadDefaultTimes]: Could not open default times file")
 
 if __name__ == "__main__":
 
@@ -175,7 +192,6 @@ if __name__ == "__main__":
 	# create GUI object
 	ui = Ui_MainWindow()
 	ui.setupUi(MainWindow)
-	# ui.tableWidget_sessions
 
 	# Make temporary object to get all sessions from database so GUI can have list in sessions tab (second tab)
 	T = DBGUI_init(pd.to_datetime(0), datetime.now())
@@ -183,7 +199,7 @@ if __name__ == "__main__":
 
 	# Handler setup
 	handler = ChangedHandler(ui, sessions)
-
+	app.aboutToQuit.connect(handler.saveDefaultTimes)
 
 	try:
 		MainWindow.show()
