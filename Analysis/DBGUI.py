@@ -292,6 +292,7 @@ def guiMain(display_Surface, clock, T):
 	distance = 0
 	# Marks when the target becomes visible
 	visibleMarker = None
+	lastDisplayedTargetIndex = None
 	reactionList = []
 	score = 0
 	targetVisible = None
