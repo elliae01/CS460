@@ -23,7 +23,13 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="false" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3">
+        <schema name="PUBLIC" object-types="function, materialized view, package, sequence, synonym, table, type, view" />
+        <schema name="SYS" object-types="type" />
+        <schema name="SYSMAN" object-types="column, function, materialized view, package, sequence, synonym, table, type, type attribute, view" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="2860bd4d-7d2b-4726-b172-a19460c356d3">
@@ -44,8 +50,12 @@
     </last-used-providers>
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
-    <mapping file-url="file://$PROJECT_DIR$/Mark/targaexport.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
     <mapping file-url="file://$PROJECT_DIR$/Mark/Import csv.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
+    <mapping file-url="file://$PROJECT_DIR$/Server/LocalDB.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="TARGABOT" />
+    <mapping file-url="file://$PROJECT_DIR$/Mark/targaexport.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
+    <mapping file-url="file://$PROJECT_DIR$/Analysis/TestDB/TestSQL.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
+    <mapping file-url="file://$PROJECT_DIR$/Mark/Import csv.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
+    <mapping file-url="file://$PROJECT_DIR$/Mark/targaexport.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="SYSMAN" />
     <mapping file-url="file://$PROJECT_DIR$/Server/LocalDB.sql" connection-id="2860bd4d-7d2b-4726-b172-a19460c356d3" session-id="MAIN" current-schema="TARGABOT" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">

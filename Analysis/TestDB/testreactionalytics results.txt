@@ -1,0 +1,85 @@
+C:\Python36\python.exe C:/Users/Mark/PycharmProjects/CS460/Analysis/testReactionalytics.py
+Hello, Welcome to Targalytics.py
+testEvent1...Created using Dates  1970-01-01 00:00:00  through  2018-03-31 23:29:14.145641   --> Elasped Time= 17621 days 23:29:14.145641
+(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=orcl)))
+Saved C:\Users\Mark\PycharmProjects\CS460\Analysis\Test DB Before Sort.csv
+Saved C:\Users\Mark\PycharmProjects\CS460\Analysis\Test DB After Sort.csv
+First Event in Database occurred on  2018-02-06 19:57:26.376000 (Expected: 2018-02-06 19:57:26.376000 )
+Last Event in Database occurred on  2018-03-17 16:08:34.975000 (Expected: 2018-03-17 16:08:34.975000 )
+Elapsed time =  38 days 20:11:08.599000 (Expected: 38 days 20:11:08.599000 )
+Total distance Traveled by user 1 =  19268.132340525473 (Expected: 18955.3292083872 )
+Total NUmber of Rows in DB =  2720 (Expected: 2720 )
+Distance traveled during playback up to row 30 =  2.8284271247461903 (Expected: 2.8284271247461903 -- H16)
+Distance traveled during playback up to row 39 =  144.2497833620557 (Expected: 144.2497833620557 -- H39)
+Total Shot count for user =  226.0
+Shot count before row 30 =  29
+Shot count before row 39 =  38
+Hit count before row 30 =  29
+Hit count before row 39 =  36
+Hit/miss ratio before row 30 =  1.0
+Hit/miss ratio before row 39 =  0.9473684210526315
+Max X 190
+Min X -99
+Max Y 110
+Min Y -99
+Total Number of actors in event =  2
+Total Number of Targets =  1
+Total Number of Shooters =  1
+-------------------Testing for 2 rows in dataframe-------------------------
+testEvent2...Created using Dates  2018-02-09 15:53:36.070000  through  2018-02-09 15:59:11.789000   --> Elasped Time= 0 days 00:05:35.719000
+(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=orcl)))
+Saved C:\Users\Mark\PycharmProjects\CS460\Analysis\Test2 DB Before Sort.csv
+Saved C:\Users\Mark\PycharmProjects\CS460\Analysis\Test2 DB After Sort.csv
+First Event in Database occurred on  2018-02-09 15:53:36.070000 (Expected: 2018-02-09 15:53:36.070000 )
+Last Event in Database occurred on  2018-02-09 15:59:11.789000 (Expected: 2018-02-09 15:59:11.789000 )
+Elapsed time =  0 days 00:05:35.719000 (Expected: 0 days 00:05:35.719000 )
+Total distance Traveled by user 1 =  1.4142135623730951 (Expected: 1.4142135623730951 )
+Total NUmber of Rows in DB =  2 (Expected: 2 )
+Error  -1.0  in getDistanceBeforeRowByUser: Row =  30  Count =  2
+Error  -1.0  in getDistanceBeforeRowByUser: Row =  39  Count =  2
+Distance traveled during playback up to row 30 =  -1.0 (Expected: -1 )
+Distance traveled during playback up to row 39 =  -1.0 (Expected: -1 )
+Distance traveled during playback up to row 2 =  1.4142135623730951 (Expected: 1.4142135623730951 -- G16)
+Error  -1.0  in getShotsBeforeRowByUser: Row =  30  Count =  2
+Error  -1.0  in getShotsBeforeRowByUser: Row =  39  Count =  2
+Total Shot count for user =  1.0
+Shot count before row 30 =  -1.0
+Shot count before row 39 =  -1.0
+Shot count before row 2 =  1
+Error  -1.0  in getShotsBeforeRowByUser: Row =  30  Count =  2
+Error  -1.0  in getShotsBeforeRowByUser: Row =  39  Count =  2
+Hit count before row 30 =  -1.0
+Hit count before row 39 =  -1.0
+Hit count before row 1 =  1
+Hit count before row 2 =  1
+Error  -1  in getHitMissRatioBeforeRowByUser: Row =  30  Count =  2
+Error  -1  in getHitMissRatioBeforeRowByUser: Row =  39  Count =  2
+Hit/miss ratio before row 30 =  -1
+Hit/miss ratio before row 39 =  -1
+Hit/miss ratio before row 2 =  1.0
+Max X 1
+Min X 0
+Max Y 1
+Min Y 0
+Total Number of actors in event =  1
+Total Number of Targets =  0
+Total Number of Shooters =  1
+-------------------Kyle's Demo-----------------------------------
+testEvent3...Created using Dates  2018-03-17 16:07:56.164000  through  2018-03-17 16:59:12   --> Elasped Time= 0 days 00:51:15.836000
+(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=orcl)))
+Total Number of actors in event =  2
+Total Number of Targets =  1
+Total Number of Shooters =  1
+-1
+Number of Target Events (Visibile=true) 3
+2576   2018-03-17 16:08:05.755
+2625   2018-03-17 16:08:15.762
+2699   2018-03-17 16:08:30.764
+Name: Date, dtype: datetime64[ns]
+Max X 190
+Min X 105
+Max Y 96
+Min Y 24
+Distance traveld to row 100 =  1451.4938050106994
+
+Process finished with exit code 0
